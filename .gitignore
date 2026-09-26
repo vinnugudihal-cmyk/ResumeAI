@@ -1,0 +1,14 @@
+node_modules/
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+.venv/
+venv/
+dist/
+build/
+# Uploaded resumes / temporary files
+backend/uploads/
+ai-service/temp_resume.pdf
+*.pdf

@@ -1,0 +1,8 @@
+flask
+flask-cors
+pypdf
+python-dotenv
+Flask==3.1.3
+flask-cors==6.0.5
+pypdf==6.18.1
+python-dotenv==1.2.3
