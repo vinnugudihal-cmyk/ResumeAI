@@ -1,0 +1,292 @@
+/* Live resume preview.
+   Mirrors the PDF layouts closely enough that what the user sees
+   while editing matches what they download. */
+
+.rp-sheet {
+  /* The document's own accent, deliberately not the app's UI
+     accent. This colour is part of the resume that gets printed
+     and downloaded, so it must not change when the interface does. */
+  --rp-accent: #3155d9;
+  --rp-ink: #1c2333;
+  --rp-muted: #6b7385;
+  --rp-rule: #e2e6ef;
+
+  background: #fff;
+  color: var(--rp-ink);
+  font-size: 11px;
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+/* ---------- fonts ---------- */
+
+.rp-font-classic {
+  font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+}
+.rp-font-modern {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+.rp-font-serif {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+/* ---------- header ---------- */
+
+.rp-head {
+  padding-bottom: 10px;
+  margin-bottom: 14px;
+  border-bottom: 0.0625em solid var(--rp-rule);
+}
+
+.rp-centre {
+  text-align: center;
+}
+
+.rp-name {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.0125em;
+}
+
+.rp-headline {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: var(--rp-accent);
+}
+
+.rp-contact {
+  margin: 8px 0 0;
+  font-size: 10px;
+  color: var(--rp-muted);
+  word-break: break-word;
+}
+
+.rp-banner {
+  padding: 18px 20px;
+  margin: -18px -18px 18px;
+  color: #fff;
+  background: var(--rp-accent);
+}
+
+.rp-banner-kicker {
+  margin: 0;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.rp-banner-name {
+  margin: 4px 0 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.rp-banner-contact {
+  margin: 7px 0 0;
+  font-size: 9.5px;
+  opacity: 0.9;
+}
+
+/* ---------- sections ---------- */
+
+.rp-section {
+  margin-bottom: 15px;
+}
+
+.rp-h {
+  margin: 0 0 7px;
+  padding-bottom: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--rp-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  border-bottom: 0.0625em solid var(--rp-rule);
+}
+
+.rp-summary {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.rp-skill-line {
+  margin: 0 0 4px;
+  font-size: 10.5px;
+}
+
+.rp-skill-label {
+  display: inline-block;
+  min-width: 54px;
+  margin-right: 6px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--rp-muted);
+  text-align: right;
+}
+
+.rp-entry {
+  margin-bottom: 11px;
+}
+
+.rp-entry:last-child {
+  margin-bottom: 0;
+}
+
+.rp-entry-top {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.rp-entry-title {
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.rp-date {
+  flex-shrink: 0;
+  font-size: 9.5px;
+  color: var(--rp-muted);
+  white-space: nowrap;
+}
+
+.rp-entry-sub {
+  margin-top: 1px;
+  font-size: 10.5px;
+  color: var(--rp-accent);
+}
+
+.rp-entry-meta {
+  margin-top: 1px;
+  font-size: 9.5px;
+  color: var(--rp-muted);
+}
+
+.rp-entry-url {
+  margin-top: 3px;
+  font-size: 9.5px;
+  color: var(--rp-muted);
+  word-break: break-all;
+}
+
+.rp-bullets {
+  margin: 4px 0 0;
+  padding-left: 14px;
+}
+
+.rp-bullets li {
+  margin-bottom: 2px;
+  font-size: 10.5px;
+}
+
+.rp-bullets li::marker {
+  color: var(--rp-accent);
+}
+
+.rp-empty {
+  margin: 24px 0;
+  font-size: 11px;
+  color: #9aa1b2;
+  text-align: center;
+}
+
+/* ---------- side rails ---------- */
+
+.rp-rail {
+  width: 33%;
+  padding: 16px;
+  color: #fff;
+  background: var(--rp-accent);
+}
+
+.rp-rail .rp-h {
+  color: #fff;
+  border-bottom-color: rgba(255, 255, 255, 0.35);
+}
+
+.rp-rail .rp-skill-label {
+  color: rgba(255, 255, 255, 0.8);
+  text-align: left;
+}
+
+.rp-rail .rp-date,
+.rp-rail .rp-entry-meta {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.rp-rail .rp-entry-url {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.rp-rail .rp-summary {
+  color: #fff;
+}
+
+.rp-sidebar_left,
+.rp-creative_split {
+  display: flex;
+}
+
+.rp-sidebar_right {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.rp-main {
+  flex: 1;
+  min-width: 0;
+  padding: 18px;
+}
+
+.rp-rail-contact {
+  padding: 16px;
+  color: #fff;
+  background: var(--rp-accent);
+  font-size: 9.5px;
+  line-height: 1.9;
+  word-break: break-word;
+}
+
+.rp-sidebar_left .rp-rail-contact {
+  order: -1;
+}
+
+/* ---------- creative split ---------- */
+
+.rp-creative_split .rp-name {
+  font-size: 30px;
+  line-height: 1.05;
+}
+
+/* ---------- mobile preview toggle ---------- */
+
+.rp-sheet.rp-mobile {
+  width: 320px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+@media (max-width: 720px) {
+  .rp-sidebar_left,
+  .rp-sidebar_right,
+  .rp-creative_split {
+    flex-direction: column;
+  }
+
+  .rp-sidebar_right .rp-rail {
+    order: 0;
+  }
+
+  .rp-rail {
+    width: 100%;
+  }
+
+  .rp-banner {
+    margin: -18px -18px 18px;
+  }
+}

@@ -79,6 +79,47 @@
   background: #5148e5;
 }
 
+/*
+  The registration action sits beside Student Login.
+
+  It is a real, visible link rather than something buried in a menu:
+  the login page deliberately has no "create an account" prompt, so
+  this is where a new student finds registration. Outlined rather
+  than filled, so the sign-in button stays the primary action.
+*/
+.nav-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.nav-button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(99, 91, 255, 0.32);
+  background: rgba(255, 255, 255, 0.72);
+  color: #4f46e5;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  transition: 0.2s ease;
+}
+
+.nav-button-secondary:hover {
+  border-color: #635bff;
+  background: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(99, 91, 255, 0.14);
+}
+
+.nav-button-secondary:focus-visible {
+  outline: 3px solid rgba(99, 91, 255, 0.45);
+  outline-offset: 2px;
+}
+
 /* =========================================================
    HERO
    ========================================================= */
@@ -175,6 +216,36 @@
 .secondary-btn:hover {
   border-color: #635bff;
   color: #635bff;
+}
+
+/*
+  The one-line registration prompt under the hero buttons.
+
+  Visible without competing with "Analyze Your Resume Now": small,
+  muted, with the action itself in the accent colour.
+*/
+.hero-register {
+  margin: 16px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #667085;
+}
+
+.hero-register a {
+  color: #4f46e5;
+  font-weight: 650;
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+
+.hero-register a:hover {
+  text-decoration: underline;
+}
+
+.hero-register a:focus-visible {
+  outline: 2px solid #635bff;
+  outline-offset: 3px;
+  border-radius: 3px;
 }
 
 /* =========================================================
@@ -1005,6 +1076,15 @@
 
   .nav-button {
     padding: 9px 12px;
+    font-size: 11px;
+  }
+
+  .nav-actions {
+    gap: 8px;
+  }
+
+  .nav-button-secondary {
+    padding: 8px 10px;
     font-size: 11px;
   }
 

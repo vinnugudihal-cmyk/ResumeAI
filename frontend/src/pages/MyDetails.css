@@ -1,0 +1,189 @@
+/* My Details - the profile-first entry to the resume journey.
+ *
+ * Deliberately thin. The form itself is <ProfileForm /> and it keeps
+ * every `cp-` class it always had, so this file only styles what is
+ * genuinely new: the flow strip, the returning-user choices, and the
+ * note about profiles and resumes being separate records.
+ *
+ * Colours come from the shared theme tokens rather than literals, so
+ * these follow the palette like everything else.
+ */
+
+.md-page {
+  max-width: 960px;
+}
+
+/* ---------- the flow strip ---------- */
+
+.md-flow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+}
+
+.md-flow-step {
+  font-size: 12px;
+  line-height: 1;
+  padding: 7px 11px;
+  border-radius: var(--app-radius-pill);
+  border: 1px solid var(--app-line);
+  background: var(--app-surface);
+  color: var(--app-muted);
+  white-space: nowrap;
+}
+
+.md-flow-current {
+  border-color: var(--app-accent-line);
+  background: var(--app-accent-soft);
+  color: var(--app-accent-hover);
+  font-weight: 600;
+}
+
+/* ---------- returning-user choices ---------- */
+
+.md-choices {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.md-choice {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+  padding: 20px;
+  border-radius: var(--app-radius);
+  border: 1px solid var(--app-line);
+  background: var(--app-surface);
+  color: var(--app-text);
+  box-shadow: var(--app-shadow);
+  font: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    transform 0.24s cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 0.24s cubic-bezier(0.2, 0, 0, 1),
+    border-color 0.24s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.md-choice strong {
+  font-size: 16px;
+  color: var(--app-text);
+}
+
+.md-choice span {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--app-dim);
+}
+
+.md-choice:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 2px 4px rgba(24, 35, 64, 0.05),
+    0 10px 24px rgba(49, 85, 217, 0.10);
+  border-color: var(--app-accent-line, #c7d2fe);
+}
+
+.md-choice-primary {
+  border-color: var(--app-accent-line);
+  background: var(--app-accent-soft);
+}
+
+.md-choice-primary strong {
+  color: var(--app-accent-hover);
+}
+
+/* Keyboard focus gets the same weight as hover, not just an outline. */
+.md-choice:focus-visible {
+  outline: 2px solid var(--app-focus);
+  outline-offset: 3px;
+  transform: translateY(-3px);
+  box-shadow:
+    0 2px 4px rgba(24, 35, 64, 0.05),
+    0 10px 24px rgba(49, 85, 217, 0.10);
+  border-color: var(--app-accent-line, #c7d2fe);
+}
+
+/* ---------- the separation note ---------- */
+
+.md-note {
+  margin-top: 20px;
+  padding: 14px 16px;
+  border-radius: var(--app-radius);
+  border: 1px solid var(--app-line);
+  background: var(--app-surface-2);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--app-dim);
+}
+
+.md-note strong {
+  color: var(--app-text);
+}
+
+/* The back control is a button here, so it needs the link styling the
+   .cp-back class would otherwise have given it. */
+.md-back-button {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* ---------- visible save status ---------- */
+
+/*
+ * The page used to flash a notice that cleared itself after four
+ * seconds. This one stays until the next edit, because a user who
+ * looked away could not otherwise tell whether anything was stored.
+ */
+.cp-saved-status {
+  font-size: 13px;
+  font-weight: 600;
+  color: #15803d;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cp-saved-status::before {
+  content: "✓";
+  font-weight: 700;
+}
+
+/* ---------- narrow screens ---------- */
+
+@media (max-width: 640px) {
+  .md-flow-step {
+    font-size: 11px;
+    padding: 6px 9px;
+  }
+
+  .md-choice {
+    padding: 16px;
+  }
+
+  /* No hover on a touch screen, so nothing is expected to move. */
+  .md-choice:hover {
+    transform: none;
+    box-shadow: var(--app-shadow);
+    border-color: var(--app-line);
+  }
+}
+
+/* ---------- reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .md-choice,
+  .md-choice:hover,
+  .md-choice:focus-visible {
+    transform: none;
+    transition: none;
+  }
+}

@@ -1,8 +1,48 @@
-import { useState, useMemo } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useCallback, useEffect, useState, useMemo } from "react";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import "./Dashboard.css";
-import ResumeUpload from "../components/ResumeUpload";
-import { calculateJobMatch, compareAnalyses } from "../services/api";
+import AnalysisHistory from "../components/AnalysisHistory";
+import RoleMatcher from "../components/RoleMatcher";
+import Landing from "../components/Landing";
+import CareerSnapshot from "../components/CareerSnapshot";
+import { compareAnalyses, fetchCurrentUser } from "../services/api";
+import { signOut } from "../services/authSession";
+import {
+  FEATURES,
+  COMING_SOON,
+  destinationFor,
+  navLabelFor,
+} from "../services/features";
+
+/**
+ * Glyphs for the sidebar only.
+ *
+ * The sidebar is a dense list and the glyphs there are decoration,
+ * so they stay as text. The dashboard cards draw real SVG icons -
+ * see Landing.jsx - because those are large enough to read and a
+ * single character does not look like an icon at card size.
+ */
+const NAV_GLYPH = {
+  create_resume: "✎",
+  resume_analysis: "◫",
+  career_profile: "◍",
+  resume_templates: "▤",
+  cv_templates: "▦",
+  cover_letter: "✉",
+  find_jobs: "⌕",
+  saved_jobs: "⚑",
+  apply_for_job: "➤",
+  applications: "▣",
+};
+import {
+  ANALYSIS,
+  FILE_META,
+  PREVIOUS_ANALYSIS,
+  readForUser,
+  writeForUser,
+  clearForUser,
+  purgeLegacyEntries,
+} from "../services/sessionCache";
 
 const PRESET_JOBS = [
   {
@@ -43,55 +83,131 @@ const CRITERIA_ICONS = {
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Navigation & UI States
   const [activeTab, setActiveTab] = useState("dashboard");
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [showUpload, setShowUpload] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+  /*
+   * The current-page highlight.
+   *
+   * This sidebar exists on exactly one route - /dashboard - and no
+   * feature links to /dashboard, so the only row that can ever be
+   * the current page is "Dashboard" itself. Highlighting a feature row
+   * by comparing the URL would look like it worked and never fire
+   * once, which is worse than not pretending.
+   *
+   * So the highlight is applied to the rows that really are current:
+   * Dashboard when the launcher is open, and each of the in-page
+   * sections when one of those is showing. A feature row navigates
+   * away to its own page, which carries its own heading.
+   */
+  const isLauncher = location.pathname === "/dashboard";
 
   // Expanded criteria cards
   const [expandedCriteria, setExpandedCriteria] = useState({});
 
-  // User Profile State
+  // User Profile State. The backend session is the source of
+  // truth; localStorage only shows a name instantly.
   const [user, setUser] = useState(() => {
     try {
       const savedUser = localStorage.getItem("resumeai_user");
-      return savedUser ? JSON.parse(savedUser) : { name: "Student", email: "student@resumeai.dev" };
+      return savedUser
+        ? JSON.parse(savedUser)
+        : { name: "Student", email: "" };
     } catch {
-      return { name: "Student", email: "student@resumeai.dev" };
+      return { name: "Student", email: "" };
     }
   });
 
-  // Analysis & File State
-  const [analysis, setAnalysis] = useState(() => {
-    try {
-      const savedAnalysis = localStorage.getItem("resumeai_analysis");
-      return savedAnalysis ? JSON.parse(savedAnalysis) : null;
-    } catch {
-      return null;
-    }
-  });
+  // Confirm the session with the server on mount so a stale
+  // cached name never shows for a different account.
+  useEffect(() => {
+    let cancelled = false;
 
-  const [fileMeta, setFileMeta] = useState(() => {
-    try {
-      const savedMeta = localStorage.getItem("resumeai_file_meta");
-      return savedMeta ? JSON.parse(savedMeta) : null;
-    } catch {
-      return null;
-    }
-  });
+    // Unscoped entries from an older version held resume data
+    // belonging to whichever account was signed in at the time,
+    // so they are removed rather than read.
+    purgeLegacyEntries();
+
+    fetchCurrentUser().then((session) => {
+      if (cancelled) return;
+
+      const current = session?.user;
+
+      if (!current) return;
+
+      setUser({
+        id: current.id,
+        name: current.name,
+        email: current.email,
+      });
+
+      try {
+        localStorage.setItem(
+          "resumeai_user",
+          JSON.stringify({
+            id: current.id,
+            name: current.name,
+            email: current.email,
+          })
+        );
+      } catch (e) {
+        console.warn(e);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  /**
+   * Sign out. One implementation, used by both the profile menu
+   * and the Settings panel.
+   *
+   * `replace` matters as much as the sign-out itself: without it
+   * the dashboard stays in the history stack and the browser Back
+   * button lands the user back on it.
+   */
+  const handleLogout = async () => {
+    setAnalysis(null);
+    setFileMeta(null);
+    setPreviousAnalysis(null);
+
+    await signOut();
+
+    navigate("/login", { replace: true });
+  };
+
+  // Analysis & File State.
+  //
+  // These deliberately start empty. Resume data used to be read
+  // straight from a shared localStorage key during the first
+  // render, so a newly signed-in user rehydrated the previous
+  // user's resume, score, skills and history. The cache is now
+  // loaded per user, once we know who is signed in (see below).
+  const [analysis, setAnalysis] = useState(null);
+  const [fileMeta, setFileMeta] = useState(null);
 
   // Previous analysis for comparison
-  const [previousAnalysis, setPreviousAnalysis] = useState(() => {
-    try {
-      const saved = localStorage.getItem("resumeai_previous_analysis");
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
+  const [previousAnalysis, setPreviousAnalysis] = useState(null);
+
+  // Load this account's own cached resume data. Nothing is shown
+  // until the signed-in user id is known, so one account can
+  // never rehydrate another account's analysis.
+  useEffect(() => {
+    if (user?.id === null || user?.id === undefined) {
+      return;
     }
-  });
+
+    setAnalysis(readForUser(ANALYSIS, user.id));
+    setFileMeta(readForUser(FILE_META, user.id));
+    setPreviousAnalysis(readForUser(PREVIOUS_ANALYSIS, user.id));
+  }, [user?.id]);
 
   const [showComparison, setShowComparison] = useState(false);
 
@@ -104,15 +220,90 @@ export default function Dashboard() {
 
   // Job Matcher State
   const [selectedPreset, setSelectedPreset] = useState(0);
-  const [jobDescription, setJobDescription] = useState(PRESET_JOBS[0].jd);
 
-  // Compute job match
-  const jobMatchResult = useMemo(() => {
-    if (analysis && jobDescription.trim()) {
-      return calculateJobMatch(jobDescription, analysis.skills || []);
+  // Target role used for role matching and missing-skill advice
+  const [targetRole, setTargetRole] = useState("");
+
+  // History: bumped after each new analysis so the list refreshes
+  /*
+   * AnalysisHistory refetches when this token changes, and it also
+   * fetches on mount. Analysing now happens on /analyse, which
+   * unmounts this page, so coming back here is a fresh mount and
+   * the history is already current - the token no longer needs to
+   * be bumped from here.
+   */
+  const [historyToken] = useState(0);
+
+  /**
+   * A job description handed over from Find Jobs.
+   *
+   * "Match my skills" on a saved job navigates here carrying the
+   * listing's own text, so the user does not have to copy and
+   * paste it. The text comes from the job they saved; nothing is
+   * written here.
+   *
+   * Read once, as a lazy initialiser, rather than from an effect on
+   * every location change. That matters for two reasons: coming
+   * back to the dashboard later must not resurrect an old job's
+   * description over whatever the user has since typed, and a
+   * refresh must not silently replace their edits.
+   */
+  const [incomingJobDescription] = useState(() => {
+    const incoming = location.state;
+
+    if (!incoming?.jobDescription) return "";
+
+    if (incoming.goToSection === "jobs") {
+      setActiveTab("jobs");
     }
-    return null;
-  }, [analysis, jobDescription]);
+
+    // Dropped straight away so a Back or a refresh does not
+    // re-apply it.
+    window.history.replaceState({}, document.title);
+
+    return incoming.jobDescription;
+  });
+
+  const [jobDescription, setJobDescription] = useState(
+    incomingJobDescription || PRESET_JOBS[0].jd
+  );
+
+  // Scroll helpers. Declared before the callbacks that use them
+  // so the reference is always in scope.
+  const goToSection = (id, tabName) => {
+    setActiveTab(tabName);
+    setMobileOpen(false);
+    if (id === "top") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    document.getElementById(id)?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
+  // Reopen a stored analysis from the history list
+  const handleOpenStoredAnalysis = useCallback((restored) => {
+    if (!restored) return;
+
+    if (analysis) {
+      setPreviousAnalysis(analysis);
+      writeForUser(PREVIOUS_ANALYSIS, user?.id, analysis);
+    }
+
+    setAnalysis(restored);
+    writeForUser(ANALYSIS, user?.id, restored);
+
+    if (restored.fileName) {
+      setFileMeta({
+        name: restored.fileName,
+        size: 0,
+      });
+    }
+
+    goToSection("analysis-section", "analysis");
+  }, [analysis, user?.id]);
 
   // Compute comparison
   const comparisonResult = useMemo(() => {
@@ -126,12 +317,52 @@ export default function Dashboard() {
   const atsScore = analysis?.ats_score ?? analysis?.breakdown?.ats ?? null;
 
   const skills = Array.isArray(analysis?.skills) ? analysis.skills : [];
+  const atsBreakdown = analysis?.ats_breakdown || null;
   const suggestions = Array.isArray(analysis?.suggestions)
     ? analysis.suggestions
     : [];
 
   const criteria = analysis?.criteria || null;
   const improvementPlan = Array.isArray(analysis?.improvement_plan) ? analysis.improvement_plan : [];
+
+  /*
+   * Everything below comes from the one analysis object the backend
+   * built, so the score, the two counts, the diagnostic and the
+   * recommendations cannot drift apart. Each has a fallback for an
+   * analysis saved before these fields existed, computed from the
+   * same plan rather than guessed.
+   */
+  const recommendations = Array.isArray(analysis?.recommendations)
+    ? analysis.recommendations
+    : [];
+
+  const criticalIssues = Array.isArray(analysis?.critical_issues)
+    ? analysis.critical_issues
+    : [];
+
+  const criticalCount =
+    analysis?.critical_issue_count ?? criticalIssues.length;
+
+  const opportunityCount =
+    analysis?.improvement_opportunities ??
+    (recommendations.length || improvementPlan.length);
+
+  // Points still on the table, read from the scorer. Capped so a
+  // stale or hand-edited record cannot promise more than 100.
+  const potentialImprovement = Math.max(
+    0,
+    Math.min(
+      100 - (analysis?.score ?? 0),
+      analysis?.potential_improvement ??
+        improvementPlan.reduce((sum, item) => sum + (item.points_lost || 0), 0)
+    )
+  );
+
+  const scoreExplanation =
+    analysis?.score_explanation ||
+    (score != null
+      ? `This resume scored ${score} out of 100.`
+      : "");
 
   const breakdown = analysis?.breakdown || {};
   const contentScore = breakdown.content ?? 0;
@@ -143,51 +374,30 @@ export default function Dashboard() {
     s.toLowerCase().includes(skillSearch.toLowerCase().trim())
   );
 
-  // When resume analysis finishes
-  const handleAnalysisComplete = (data, file) => {
-    // Save current analysis as previous for comparison
-    if (analysis && analysis.score !== undefined) {
-      setPreviousAnalysis(analysis);
-      try {
-        localStorage.setItem("resumeai_previous_analysis", JSON.stringify(analysis));
-      } catch (e) {
-        console.warn("Storage error", e);
-      }
-    }
+  // ATS explanation, supplied by the backend. Never derived here.
+  const atsComponents = atsBreakdown?.components || null;
 
-    setAnalysis(data);
-    setShowUpload(false);
-    setExpandedCriteria({});
+  const roleMatch = analysis?.role_match || null;
 
-    const meta = {
-      name: file?.name || data.fileName || "Uploaded_Resume.pdf",
-      size: file?.size || data.fileSize || 180 * 1024,
-      date: new Date().toLocaleDateString(undefined, {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      }),
-    };
+  /*
+   * The upload used to complete inside a modal on this page, and
+   * this handler folded the result into the local state. The
+   * upload now lives on /analyse, which writes the result to the
+   * same per-user cache this page already reads on mount, so the
+   * handler is gone and nothing here lost the ability to show an
+   * analysis. Going to /analyse and coming back shows the same
+   * panel it always did.
+   */
 
-    setFileMeta(meta);
-
-    try {
-      localStorage.setItem("resumeai_analysis", JSON.stringify(data));
-      localStorage.setItem("resumeai_file_meta", JSON.stringify(meta));
-    } catch (e) {
-      console.warn("Storage error", e);
-    }
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
-  // Open upload window
+  // Start an analysis.
+  //
+  // This used to open an upload modal that lived on this page. The
+  // upload now has its own page - /analyse - so every entry point
+  // here goes to it. Eleven buttons on this page call this one
+  // function, so they all arrive at the same real screen.
   const handleNewAnalysis = () => {
-    setShowUpload(true);
     setMobileOpen(false);
+    navigate("/analyse");
   };
 
   // Clear current analysis
@@ -197,12 +407,8 @@ export default function Dashboard() {
       setFileMeta(null);
       setResolvedSuggestions({});
       setExpandedCriteria({});
-      try {
-        localStorage.removeItem("resumeai_analysis");
-        localStorage.removeItem("resumeai_file_meta");
-      } catch (e) {
-        console.warn(e);
-      }
+      clearForUser(ANALYSIS, user?.id);
+      clearForUser(FILE_META, user?.id);
     }
   };
 
@@ -244,27 +450,19 @@ export default function Dashboard() {
     setJobDescription(PRESET_JOBS[index].jd);
   };
 
-  // Sign out
-  const handleSignOut = () => {
-    try {
-      localStorage.removeItem("resumeai_user");
-    } catch (e) {
-      console.warn(e);
-    }
-    navigate("/login");
-  };
+  /**
+   * Send the text to the evidence-based matcher.
+   *
+   * The dashboard used to score this text in the browser with a
+   * keyword list, which could not tell an essential requirement from
+   * a preferred one or a self-reported skill from a demonstrated
+   * one. The real engine lives on /job-match.
+   */
+  const openEvidenceMatch = () => {
+    const text = jobDescription.trim();
 
-  // Scroll helpers
-  const goToSection = (id, tabName) => {
-    setActiveTab(tabName);
-    setMobileOpen(false);
-    if (id === "top") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
-    }
-    document.getElementById(id)?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
+    navigate("/job-match", {
+      state: { prefill: text ? { description: text } : null },
     });
   };
 
@@ -316,7 +514,7 @@ export default function Dashboard() {
         )}
 
         <div className="sidebar-logo">
-          <Link to="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "12px", color: "inherit" }}>
+          <Link to="/dashboard" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "12px", color: "inherit" }}>
             <div className="logo-mark">R</div>
             <span>ResumeAI</span>
           </Link>
@@ -326,34 +524,72 @@ export default function Dashboard() {
           <p className="nav-label">MENU</p>
 
           <button
-            className={`nav-item ${activeTab === "dashboard" ? "active" : ""}`}
+            className={`nav-item ${
+              isLauncher && activeTab === "dashboard" ? "active" : ""
+            }`}
             type="button"
             onClick={() => goToSection("top", "dashboard")}
+            aria-current={isLauncher ? "page" : undefined}
           >
             <span>⌂</span>
             Dashboard
           </button>
 
-          <button
-            className={`nav-item ${activeTab === "my-resume" ? "active" : ""}`}
-            type="button"
-            onClick={() => {
-              setActiveTab("my-resume");
-              handleNewAnalysis();
-            }}
-          >
-            <span>▣</span>
-            My Resume
-          </button>
+          {/*
+            Every feature the app has, in one order, read from the
+            shared list so this menu and the dashboard launch grid
+            cannot fall out of step with each other or with App.jsx.
+            `destinationFor` resolves the anchor, so a feature that
+            opens a section of this page navigates instead of
+            jumping to a URL that does not exist on its own.
+          */}
+          {FEATURES.map((feature) => (
+            <Link
+              key={feature.key}
+              to={destinationFor(feature)}
+              className="nav-item"
+              style={{ textDecoration: "none" }}
+            >
+              <span>{NAV_GLYPH[feature.key] || "•"}</span>
+              {navLabelFor(feature)}
+            </Link>
+          ))}
 
-          <button
-            className={`nav-item ${activeTab === "analysis" ? "active" : ""}`}
-            type="button"
-            onClick={() => goToSection("analysis-section", "analysis")}
+          {/*
+            Two connected surfaces that are not launcher cards. The
+            Career Readiness Roadmap and Career Mission work on a
+            target job rather than on the loaded resume, so they get
+            their own rows instead of an eleventh card.
+          */}
+          <Link
+            to="/job-match"
+            className="nav-item"
+            style={{ textDecoration: "none" }}
+          >
+            <span>◎</span>
+            Career Readiness Roadmap
+          </Link>
+
+          <Link
+            to="/career-mission"
+            className="nav-item"
+            style={{ textDecoration: "none" }}
           >
             <span>◈</span>
-            Resume Analysis
-          </button>
+            Career Mission
+          </Link>
+
+          {/*
+            The "My Resume" item is gone from this menu.
+
+            It called `handleNewAnalysis`, which is exactly what the
+            "Analyse Resume" card above it does, so it was a second
+            name for the same action sitting one row below the
+            first. Remove the row, not the feature: /my-resumes,
+            the editor at /resume-builder/:id and every stored
+            resume are untouched, and "Create My Resume" still leads
+            to the gallery and then the editor.
+          */}
 
           <button
             className={`nav-item ${activeTab === "diagnostic" ? "active" : ""}`}
@@ -365,16 +601,24 @@ export default function Dashboard() {
           </button>
 
           <button
-            className={`nav-item ${activeTab === "jobs" ? "active" : ""}`}
+            className={`nav-item ${activeTab === "history" ? "active" : ""}`}
             type="button"
-            onClick={() => goToSection("jobs-section", "jobs")}
+            onClick={() => goToSection("history-section", "history")}
           >
-            <span>⌁</span>
-            Job Matches
+            <span>◷</span>
+            History
           </button>
 
           <p className="nav-label settings-label">ACCOUNT</p>
 
+          {/*
+            Only Settings and Logout live here.
+
+            Profile used to appear in this group as well as in the
+            feature list above, both pointing at /career-profile -
+            two entries for one page, which is exactly the kind of
+            duplication that makes a menu hard to scan.
+          */}
           <button
             className={`nav-item ${activeTab === "settings" ? "active" : ""}`}
             type="button"
@@ -382,6 +626,15 @@ export default function Dashboard() {
           >
             <span>⚙</span>
             Settings
+          </button>
+
+          <button
+            className="nav-item nav-item-danger"
+            type="button"
+            onClick={handleLogout}
+          >
+            <span>⏻</span>
+            Logout
           </button>
         </nav>
 
@@ -401,6 +654,14 @@ export default function Dashboard() {
           MAIN CONTENT
       ====================================== */}
       <main className="dashboard-main">
+        {/*
+          The launcher. Everything it links to is the feature
+          itself, so this is navigation rather than a second home
+          page: the analysis panel stays on this route directly
+          below it, and nothing that used to live here has moved.
+        */}
+        <Landing user={user} />
+
         {/* TOP BAR */}
         <header className="topbar">
           <button
@@ -514,7 +775,7 @@ export default function Dashboard() {
                   <button
                     type="button"
                     className="profile-menu-item logout"
-                    onClick={handleSignOut}
+                    onClick={handleLogout}
                   >
                     <span>🚪</span> Sign Out
                   </button>
@@ -524,41 +785,73 @@ export default function Dashboard() {
           </div>
         </header>
 
+        {/*
+          Real progress, read from the database for this account.
+
+          This is the answer to "where am I?", placed before the
+          analysis panels. It links to the feature behind every
+          number and shows an honest empty state when a new account
+          has nothing yet.
+        */}
+        <CareerSnapshot
+          onOpenHistory={() => goToSection("history-section", "history")}
+        />
+
         {/* =====================================
             WELCOME SECTION
         ====================================== */}
-        <section className="welcome-section">
-          <div>
-            <p className="eyebrow">RESUME DASHBOARD</p>
-            <h1>
-              Welcome back, {user.name?.split(" ")[0] || "User"} <span>👋</span>
-            </h1>
-            <p className="welcome-text">
-              Here is an overview of your resume quality, detected skills, and ATS audit metrics.
-            </p>
-          </div>
+        {/*
+          Actions, not a second welcome.
 
-          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-            {analysis && (
-              <button
-                type="button"
-                className="action-chip-btn"
-                onClick={handlePrintReport}
-                title="Print or save as PDF"
-              >
-                🖨️ Export Report
-              </button>
-            )}
-
+          This used to carry its own <h1> "Welcome back" and a
+          paragraph restating what the launcher above already says,
+          so the page opened with two headings and two descriptions.
+          The launcher owns the greeting; this row keeps only the
+          two things it uniquely does - export a report of an
+          analysis that already happened, and start a new upload.
+        */}
+        <div className="quick-actions">
+          {analysis && (
             <button
-              className="primary-btn"
               type="button"
-              onClick={handleNewAnalysis}
+              className="action-chip-btn"
+              onClick={handlePrintReport}
+              title="Print or save as PDF"
             >
-              + Upload New Resume
+              Export Report
             </button>
-          </div>
-        </section>
+          )}
+
+          <button
+            className="primary-btn"
+            type="button"
+            onClick={handleNewAnalysis}
+          >
+            Upload New Resume
+          </button>
+        </div>
+
+        {/*
+          The old `feature-launch` section - a second copy of the
+          feature grid, sitting under the launcher that now does the
+          same job - was removed here. Two grids of the same eight
+          features on one page is exactly the duplication it was
+          meant to solve.
+
+          "Not built yet" is kept, because an honest gap is worth
+          saying out loud; it now appears once instead of beside a
+          duplicate of everything that does work.
+        */}
+        <details className="feature-soon">
+          <summary>Not built yet ({COMING_SOON.length})</summary>
+          <ul>
+            {COMING_SOON.map((item) => (
+              <li key={item.label}>
+                <strong>{item.label}</strong> — {item.note}
+              </li>
+            ))}
+          </ul>
+        </details>
 
         {/* =====================================
             STAT CARDS
@@ -596,7 +889,17 @@ export default function Dashboard() {
             <div className="stat-arrow">→</div>
           </button>
 
-          {/* ISSUES FOUND */}
+          {/*
+            ISSUES, SPLIT INTO TWO HONEST NUMBERS
+
+            This used to show `suggestions.length` under the label
+            "Issues Found". That made the count mean two different
+            things at once: a resume with real problems and a resume
+            that was simply excellent both reported 0, because the
+            generic suggestion list was often empty even when the
+            scorer had marked points off. The number now comes from
+            the backend's own analysis.
+          */}
           <button
             className="stat-card stat-card-button"
             type="button"
@@ -604,8 +907,21 @@ export default function Dashboard() {
           >
             <div className="stat-icon orange">!</div>
             <div className="stat-content">
-              <p>Issues Found</p>
-              <h2>{analysis ? suggestions.length : "--"}</h2>
+              <p>Critical Issues</p>
+              <h2>{analysis ? criticalCount : "--"}</h2>
+            </div>
+            <div className="stat-arrow">→</div>
+          </button>
+
+          <button
+            className="stat-card stat-card-button"
+            type="button"
+            onClick={() => goToSection("diagnostic-section", "diagnostic")}
+          >
+            <div className="stat-icon">↗</div>
+            <div className="stat-content">
+              <p>Improvement Opportunities</p>
+              <h2>{analysis ? opportunityCount : "--"}</h2>
             </div>
             <div className="stat-arrow">→</div>
           </button>
@@ -671,10 +987,61 @@ export default function Dashboard() {
                     </div>
                   ))}
                 </div>
+                {comparisonResult.improvedCriteria?.length > 0 && (
+                  <div className="comparison-list">
+                    <strong className="comparison-list-title improved">
+                      Criteria improved
+                    </strong>
+                    <ul>
+                      {comparisonResult.improvedCriteria.map((item) => (
+                        <li key={item.key}>
+                          {item.label}: +{item.delta} points
+                          <span className="comparison-list-note">
+                            {" "}
+                            ({item.oldScore} → {item.newScore}/
+                            {item.maxScore})
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {comparisonResult.remainingGaps?.length > 0 && (
+                  <div className="comparison-list">
+                    <strong className="comparison-list-title open">
+                      Still open
+                    </strong>
+                    <ul>
+                      {comparisonResult.remainingGaps.map((item) => (
+                        <li key={item.key}>
+                          {item.label}: {item.pointsLost} points still
+                          available
+                          <span className="comparison-list-note">
+                            {" "}
+                            ({item.score}/{item.maxScore})
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
                 {comparisonResult.addedSkills.length > 0 && (
                   <div style={{ marginTop: "12px" }}>
                     <strong style={{ fontSize: "13px", color: "#10b981" }}>+ New skills detected: </strong>
                     <span style={{ fontSize: "13px", color: "#475569" }}>{comparisonResult.addedSkills.join(", ")}</span>
+                  </div>
+                )}
+
+                {comparisonResult.removedSkills?.length > 0 && (
+                  <div style={{ marginTop: "8px" }}>
+                    <strong style={{ fontSize: "13px", color: "#64748b" }}>
+                      No longer detected:{" "}
+                    </strong>
+                    <span style={{ fontSize: "13px", color: "#475569" }}>
+                      {comparisonResult.removedSkills.join(", ")}
+                    </span>
                   </div>
                 )}
               </div>
@@ -838,7 +1205,7 @@ export default function Dashboard() {
                 <h3>📊 Score Diagnostic — Where Points Were Lost</h3>
                 <p>
                   {score !== null
-                    ? `Your resume scored ${score}/100. Here's exactly where the ${100 - score} missing points went.`
+                    ? `Your resume scored ${score}/100. This report explains what is working, what needs improvement, why points were lost, and what you can do next.`
                     : "Upload a resume to see a full diagnostic breakdown."}
                 </p>
               </div>
@@ -1047,10 +1414,30 @@ export default function Dashboard() {
 
               <div className="plan-cta">
                 <p>
-                  <strong>Estimated improvement:</strong> Fixing the top 3 areas could increase your score by up to{" "}
-                  <strong style={{ color: "#10b981" }}>
-                    +{improvementPlan.slice(0, 3).reduce((sum, item) => sum + item.points_lost, 0)} points
-                  </strong>.
+                  {/*
+                    The figure is the scorer's own: the criteria max
+                    out at 100, so the points they lost are the
+                    points that can be won back. Previously this
+                    summed only the top three rows and called the
+                    result an estimate, which is why it said "+10"
+                    on a resume the diagnostic had scored 88.
+                  */}
+                  <strong>Estimated improvement:</strong>{" "}
+                  {scoreExplanation ||
+                    `This resume scored ${score} out of 100.`}{" "}
+                  {potentialImprovement > 0 && (
+                    <>
+                      Fixing these areas could add up to{" "}
+                      <strong style={{ color: "#10b981" }}>
+                        +{potentialImprovement} points
+                      </strong>
+                      , taking it to at most {score + potentialImprovement}
+                      . No score is guaranteed.
+                    </>
+                  )}
+                  {potentialImprovement === 0 && (
+                    <>There is nothing left to earn on this resume.</>
+                  )}
                 </p>
                 <button
                   type="button"
@@ -1140,9 +1527,95 @@ export default function Dashboard() {
               <div className="empty-state">
                 <div>✓</div>
                 <p>
+                  {/*
+                    The old wording here was "No improvement
+                    suggestions were returned by the analyzer. Great
+                    job!" - shown whenever the list came back empty,
+                    which happened even at 88/100 because the list
+                    came from an unconfigured service rather than
+                    from the score. It congratulated a resume that
+                    had lost twelve points.
+
+                    It now says what is actually true, and points at
+                    the diagnostic when there are points to win.
+                  */}
+                  {!analysis
+                    ? "Upload your resume to receive personalized improvement suggestions."
+                    : opportunityCount > 0 || potentialImprovement > 0
+                      ? `No suggestions were returned by this analyzer, but the score shows ${potentialImprovement} point${
+                          potentialImprovement === 1 ? "" : "s"
+                        } still available across ${opportunityCount} area${
+                          opportunityCount === 1 ? "" : "s"
+                        }. Open Score Diagnostic to see exactly which criteria lost them.`
+                      : score === 100
+                        ? "Every scoring criterion was met in full. There is nothing left to improve."
+                        : `This analyzer returned no suggestions for this resume. It scored ${score} out of 100, which is recorded in Score Diagnostic.`}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* HOW THE ATS SCORE IS CALCULATED */}
+          <div className="panel" id="ats-section">
+            <div className="panel-header">
+              <div>
+                <h3>How Your ATS Score Works</h3>
+                <p>
+                  Three transparent checks, each shown with the
+                  weight it contributes.
+                </p>
+              </div>
+
+              {atsScore !== null && (
+                <span className="score-status">{atsScore}%</span>
+              )}
+            </div>
+
+            {atsComponents ? (
+              <>
+                <div className="ats-components">
+                  {Object.entries(atsComponents).map(
+                    ([key, part]) => (
+                      <div className="ats-component" key={key}>
+                        <div className="ats-component-head">
+                          <span className="ats-component-label">
+                            {part.label}
+                          </span>
+                          <span className="ats-component-weight">
+                            {Math.round(part.weight * 100)}% weight
+                          </span>
+                        </div>
+
+                        <div className="ats-component-bar">
+                          <span
+                            style={{ width: `${part.percent}%` }}
+                          />
+                        </div>
+
+                        <div className="ats-component-foot">
+                          <span>
+                            {part.score}/{part.max_score} points
+                          </span>
+                          <span>{part.percent}%</span>
+                        </div>
+                      </div>
+                    )
+                  )}
+                </div>
+
+                {atsBreakdown?.disclaimer && (
+                  <p className="ats-disclaimer">
+                    {atsBreakdown.disclaimer}
+                  </p>
+                )}
+              </>
+            ) : (
+              <div className="empty-state">
+                <div>&#9670;</div>
+                <p>
                   {analysis
-                    ? "No improvement suggestions were returned by the analyzer. Great job!"
-                    : "Upload your resume to receive personalized improvement suggestions."}
+                    ? "Score components were not stored for this analysis."
+                    : "Upload a resume to see how the score is calculated."}
                 </p>
               </div>
             )}
@@ -1175,34 +1648,40 @@ export default function Dashboard() {
                   />
                 </div>
 
-                <div className="skills-list">
+                {/* Clean skill tags. No fake proficiency bars:
+                    every skill here was actually found in the
+                    resume, so they all carry the same weight. */}
+                <div className="skill-tag-grid">
                   {filteredSkills.map((skill, index) => (
-                    <div className="skill-row" key={`${skill}-${index}`}>
-                      <div className="skill-top">
-                        <span style={{ textTransform: "capitalize" }}>{skill}</span>
-                        <strong>Detected</strong>
-                      </div>
-                      <div className="progress">
-                        <span style={{ width: "100%" }} />
-                      </div>
-                    </div>
+                    <span
+                      className="skill-tag"
+                      key={`${skill}-${index}`}
+                      title={`${skill} was found in your resume`}
+                    >
+                      <span className="skill-tag-dot" aria-hidden="true" />
+                      {skill}
+                    </span>
                   ))}
-
-                  {filteredSkills.length === 0 && (
-                    <p style={{ color: "#64748b", fontSize: "14px", padding: "10px 0" }}>
-                      No skills match "{skillSearch}".
-                    </p>
-                  )}
                 </div>
+
+                {filteredSkills.length === 0 && (
+                  <p style={{ color: "#64748b", fontSize: "14px", padding: "10px 0" }}>
+                    No skills match "{skillSearch}".
+                  </p>
+                )}
               </>
             ) : (
               <div className="empty-state">
                 <div>◆</div>
                 <p>
                   {analysis
-                    ? "No technical skills were detected."
+                    ? "No skills detected yet"
                     : "Upload a resume to detect your technical skills."}
                 </p>
+
+                <button type="button" onClick={handleNewAnalysis}>
+                  {analysis ? "Upload Another Resume" : "Upload Resume"}
+                </button>
               </div>
             )}
           </div>
@@ -1216,31 +1695,30 @@ export default function Dashboard() {
             <div className="panel-header">
               <div>
                 <h3>Job Description Matcher</h3>
-                <p>Compare your resume against any target job posting to find keyword gaps</p>
+                <p>
+                  Compare your profile and resume against a real job
+                  advert, using recorded evidence.
+                </p>
               </div>
-
-              {jobMatchResult && (
-                <span
-                  className={`match-score-pill ${
-                    jobMatchResult.matchScore >= 75
-                      ? "high"
-                      : jobMatchResult.matchScore >= 50
-                      ? "medium"
-                      : "low"
-                  }`}
-                >
-                  {jobMatchResult.matchScore}% Match
-                </span>
-              )}
             </div>
 
+            <div className="role-panel-divider" />
+
+            <RoleMatcher
+              selectedRole={targetRole}
+              onRoleChange={setTargetRole}
+              match={roleMatch}
+            />
+
             <div className="job-match-wrapper">
-              <div className="preset-pills-label">Select a target role or paste your own job description:</div>
+              <div className="preset-pills-label">
+                Start from a sample description, or paste an advert:
+              </div>
 
               <div className="preset-pills">
                 {PRESET_JOBS.map((preset, idx) => (
                   <button
-                    key={idx}
+                    key={preset.title}
                     type="button"
                     className={`preset-pill-btn ${selectedPreset === idx ? "active" : ""}`}
                     onClick={() => handleSelectPreset(idx)}
@@ -1258,66 +1736,27 @@ export default function Dashboard() {
                   setSelectedPreset(-1);
                   setJobDescription(e.target.value);
                 }}
-                placeholder="Paste the job description or requirements here to check ATS match..."
+                aria-label="Job description to match"
+                placeholder="Paste the job description or requirements here..."
               />
 
-              {/* MATCH RESULTS */}
-              {jobMatchResult ? (
-                <div className="job-match-results">
-                  <div className="job-match-header">
-                    <div>
-                      <strong style={{ fontSize: "16px", color: "#1e293b" }}>
-                        Match Analysis: {jobMatchResult.matchScore}% Compatibility
-                      </strong>
-                      <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: "13px" }}>
-                        Found {jobMatchResult.matchedSkills.length} out of {jobMatchResult.totalRequired} required skills in your resume.
-                      </p>
-                    </div>
-                  </div>
+              <div className="job-match-cta">
+                <button
+                  type="button"
+                  className="primary-btn"
+                  onClick={openEvidenceMatch}
+                >
+                  Open the evidence-based matcher →
+                </button>
 
-                  {/* MATCHED SKILLS */}
-                  <div className="matched-skills-group">
-                    <strong>✓ Matched In Your Resume:</strong>
-                    <div className="skills-pill-row">
-                      {jobMatchResult.matchedSkills.length > 0 ? (
-                        jobMatchResult.matchedSkills.map((s, idx) => (
-                          <span key={idx} className="pill-matched">
-                            ✓ {s}
-                          </span>
-                        ))
-                      ) : (
-                        <span style={{ color: "#94a3b8", fontSize: "13px" }}>
-                          No direct skill matches found for this job posting.
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* MISSING SKILLS */}
-                  <div className="matched-skills-group" style={{ marginBottom: 0 }}>
-                    <strong>+ Recommended Keywords to Add:</strong>
-                    <div className="skills-pill-row">
-                      {jobMatchResult.missingSkills.length > 0 ? (
-                        jobMatchResult.missingSkills.map((s, idx) => (
-                          <span key={idx} className="pill-missing">
-                            + {s}
-                          </span>
-                        ))
-                      ) : (
-                        <span style={{ color: "#059669", fontSize: "13px", fontWeight: "600" }}>
-                          🎉 Perfect alignment! All detected key requirements are present in your resume.
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <p style={{ color: "#64748b", fontSize: "14px", marginTop: "10px" }}>
-                  {analysis
-                    ? "Paste or select a job description above to calculate match percentage."
-                    : "Upload a resume first to evaluate job description matching."}
+                <p className="job-match-cta-note">
+                  The matcher separates essential requirements from
+                  preferred ones, shows what your projects and latest
+                  resume analysis demonstrate, and never treats a missing
+                  keyword as proof that you lack a skill. The sample
+                  descriptions above are examples, not live vacancies.
                 </p>
-              )}
+              </div>
             </div>
           </div>
         </section>
@@ -1337,7 +1776,23 @@ export default function Dashboard() {
             <div className="settings-row">
               <div>
                 <strong>Active Profile</strong>
-                <p>{user.email || "student@resumeai.dev"} ({user.name || "Student"})</p>
+                <p>
+                  {user.email || "Not signed in"}{" "}
+                  ({user.name || "Student"})
+                </p>
+              </div>
+              <button type="button" onClick={handleLogout}>
+                Log Out
+              </button>
+            </div>
+
+            <div className="settings-row">
+              <div>
+                <strong>Display Name</strong>
+                <p>
+                  Shown in this browser only. Your account name is
+                  set when you register.
+                </p>
               </div>
               <button
                 type="button"
@@ -1385,11 +1840,7 @@ export default function Dashboard() {
                 type="button"
                 onClick={() => {
                   setPreviousAnalysis(null);
-                  try {
-                    localStorage.removeItem("resumeai_previous_analysis");
-                  } catch (e) {
-                    console.warn(e);
-                  }
+                  clearForUser(PREVIOUS_ANALYSIS, user?.id);
                 }}
                 disabled={!previousAnalysis}
               >
@@ -1397,38 +1848,37 @@ export default function Dashboard() {
               </button>
             </div>
           </div>
+
+          {/* =====================================
+              ANALYSIS HISTORY  (SQLite backed)
+          ====================================== */}
+          <div className="panel" id="history-section">
+            <div className="panel-header">
+              <div>
+                <h3>Analysis History</h3>
+                <p>
+                  Every resume you analyze is saved to the
+                  ResumeAI database.
+                </p>
+              </div>
+            </div>
+
+            <AnalysisHistory
+              currentAnalysisId={analysis?.analysis_id ?? null}
+              onOpenAnalysis={handleOpenStoredAnalysis}
+              onRefreshToken={historyToken}
+            />
+          </div>
         </section>
       </main>
 
-      {/* =====================================
-          UPLOAD MODAL
-      ====================================== */}
-      {showUpload && (
-        <div
-          className="upload-modal-overlay"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setShowUpload(false);
-            }
-          }}
-        >
-          <div className="upload-modal">
-            <button
-              className="modal-close"
-              type="button"
-              onClick={() => setShowUpload(false)}
-              aria-label="Close upload window"
-            >
-              ×
-            </button>
-
-            <ResumeUpload
-              onAnalysisComplete={handleAnalysisComplete}
-              jobDescription={jobDescription}
-            />
-          </div>
-        </div>
-      )}
+      {/*
+        The upload modal that used to live here is gone. The file
+        picker, the analysis run and the results all moved to
+        /analyse, and `handleNewAnalysis` now navigates there, so
+        this page and that one no longer offer two ways to do the
+        same thing.
+      */}
     </div>
   );
 }

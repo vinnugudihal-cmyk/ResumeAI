@@ -1,0 +1,315 @@
+/* =========================================
+   ResumeAI - the shared card hover
+   =========================================
+
+   ONE hover style for every clickable card in the app.
+
+   The dashboard, the resume and CV template galleries, the resume
+   builder's design picker, saved resumes, saved jobs, job results,
+   applications, cover letters and the saved qualification cards on
+   My Details all respond the same way: the card lifts a few pixels,
+   the border takes a soft light blue, and a layered shadow gathers
+   underneath with a faint glass highlight along the top edge.
+
+   --------------------------------------------------
+   NO LEFT ACCENT STRIP
+   --------------------------------------------------
+
+   These cards used to grow a 4px blue strip along their left edge on
+   hover, drawn by a `::before`. It read as a vertical line stuck to
+   the card rather than as part of the surface, and the brief asks for
+   it gone everywhere. The pseudo-element is deleted outright - not
+   hidden, not made transparent - so there is nothing left to
+   reappear at another screen width or under another selector.
+
+   The feedback it provided is now carried by the lift, the border
+   and a stronger layered shadow, so a card still clearly responds to
+   the pointer without a line being drawn on it.
+
+   Left borders that are NOT this and are still here, deliberately:
+   `.rb-suggestions blockquote`, `.role-result-note`, `.cm-next`,
+   `.ats-disclaimer` (callout and quote styling - a left rule is what
+   those mean), `.criteria-detail-section li` (detected / missing /
+   action markers) and `.history-row.is-current` (a selected row, not
+   a hover). None of them are card hovers.
+
+   --------------------------------------------------
+   WHY ONE FILE
+   --------------------------------------------------
+
+   Every one of these cards already had its own hover, written at the
+   time it was built, and they had drifted apart: a 1px lift here, a
+   4px lift there, a blue shadow on some and a grey one on others.
+   That is the same class of problem the shared layer in theme.css
+   used to cause, so this is deliberately the opposite of it.
+
+   The page stylesheets keep their own layout, spacing, borders,
+   radius and typography. This file changes only how a card
+   *responds*. It is imported last from main.jsx, so where a page
+   declared a competing hover, the shared one wins.
+
+   --------------------------------------------------
+   WHY AN EXPLICIT LIST
+   --------------------------------------------------
+
+   There is deliberately no `div`, no `.card`, no `[class*=card]`
+   here. A broad selector would put a hover on form panels, on the
+   result panels inside the analysis results, and on plain text
+   rows - all of which are containers, not things you click.
+
+   Two classes that LOOK like cards were left out on purpose:
+
+     .fj-card   a <form> for the search box AND a <section> wrapper
+                for results. Neither is a clickable card.
+     .cp-card   the form sections on My Details - Personal details,
+                Education, Experience. They contain inputs; lifting
+                them on hover would be decoration, not feedback.
+
+   The saved qualification cards INSIDE the Education section are a
+   different thing and ARE included: `.ed-row` is a card that holds
+   one saved entry and its Edit/Delete controls, not a panel of
+   inputs, so it behaves like every other card here. Its form is a
+   separate element (`.ed-form`) and is not in the list.
+
+   --------------------------------------------------
+   WHY NOTHING SHIFTS
+   --------------------------------------------------
+
+   `transform` moves the card without touching layout, so no sibling
+   moves and no scrollbar appears. The border colour changes rather
+   than the border width, so the box keeps its exact size. Nothing is
+   laid over any content, so there is nothing to intercept a click.
+   ========================================= */
+
+/* Every card that takes part. */
+
+.tg-tile,
+.rb-design,
+.fj-saved-item,
+.fj-result,
+.ap-entry,
+.cl-entry,
+.mr-card,
+.md-choice,
+.stat-card,
+.land-card,
+.land-hero-card,
+.ed-row {
+  position: relative;
+
+  transition:
+    transform var(--card-hover-dur) var(--card-hover-ease),
+    box-shadow var(--card-hover-dur) var(--card-hover-ease),
+    border-color var(--card-hover-dur) ease,
+    background-color var(--card-hover-dur) ease;
+}
+
+/* Hover, and keyboard focus, get the same treatment: a card you can
+   tab to must not look different from one you can point at. */
+
+.tg-tile:hover,
+.tg-tile:focus-within,
+.rb-design:hover,
+.rb-design:focus-visible,
+.fj-saved-item:hover,
+.fj-result:hover,
+.fj-result:focus-within,
+.ap-entry:hover,
+.ap-entry:focus-within,
+.cl-entry:hover,
+.cl-entry:focus-visible,
+.mr-card:hover,
+.mr-card:focus-within,
+.md-choice:hover,
+.md-choice:focus-visible,
+.stat-card:hover,
+.land-card:hover,
+.land-card:focus-visible,
+.land-hero-card:hover,
+.land-hero-card:focus-visible,
+.ed-row:hover,
+.ed-row:focus-within {
+  transform: translateY(var(--card-hover-lift, -5px));
+
+  /* Soft light blue, not the accent itself - a saturated border on
+     ten cards at once reads as an error state. */
+  border-color: var(--card-hover-border, #c7d2fe);
+
+  /* A layered shadow: a tight contact shadow, a soft blue-tinted
+     spread, and a faint white highlight along the top edge that
+     reads as light catching a glass surface. The highlight is an
+     inset shadow rather than a pseudo-element, so it can never sit
+     over the card's text. */
+  box-shadow: var(--card-hover-shadow);
+}
+
+/* The roomy dashboard cards add the very small scale on top of the
+   lift. It is declared after the shared rule above, so it wins only
+   for these three classes; the dense template grids keep the plain
+   lift and never scale into their neighbour. */
+
+.land-card:hover,
+.land-card:focus-visible,
+.land-hero-card:hover,
+.land-hero-card:focus-visible,
+.stat-card:hover,
+.stat-card:focus-visible {
+  transform:
+    translateY(var(--card-hover-lift, -5px))
+    scale(var(--card-hover-scale, 1.01));
+}
+
+/* Keyboard focus keeps a visible ring on top of the shared lift,
+   border and shadow. Without it the shared `box-shadow` above would
+   replace the ring each page draws for `:focus-visible`, and a card
+   reached by Tab would look like nothing more than a hovered one. */
+
+.tg-tile:focus-within,
+.rb-design:focus-visible,
+.fj-result:focus-within,
+.ap-entry:focus-within,
+.cl-entry:focus-visible,
+.mr-card:focus-within,
+.md-choice:focus-visible,
+.stat-card:focus-visible,
+.land-card:focus-visible,
+.land-hero-card:focus-visible {
+  box-shadow:
+    0 0 0 3px var(--card-focus-ring, rgba(49, 85, 217, 0.32)),
+    var(--card-hover-shadow);
+}
+
+/* A press is the opposite of a hover - it should feel like pushing
+   the card back down, not lifting further. */
+
+.tg-tile:active,
+.rb-design:active,
+.fj-saved-item:active,
+.fj-result:active,
+.ap-entry:active,
+.cl-entry:active,
+.mr-card:active,
+.md-choice:active,
+.stat-card:active,
+.land-card:active,
+.land-hero-card:active,
+.ed-row:active {
+  transform: translateY(-1px);
+  box-shadow: var(--card-shadow-rest, 0 1px 2px rgba(24, 35, 64, 0.04));
+}
+
+/* ---------- no pointer ---------- */
+
+/*
+  A touch screen never fires `:hover`, and several mobile browsers fire
+  it once on tap and leave the card stuck in the raised state - so the
+  lift is switched off outright rather than left to chance.
+
+  Border, fill and resting shadow are untouched, so the card still
+  reads as a card. Every one of these is a link or a button, so
+  tapping still works.
+*/
+
+@media (hover: none) {
+  .tg-tile:hover,
+  .tg-tile:focus-within,
+  .rb-design:hover,
+  .rb-design:focus-visible,
+  .fj-saved-item:hover,
+  .fj-result:hover,
+  .fj-result:focus-within,
+  .ap-entry:hover,
+  .ap-entry:focus-within,
+  .cl-entry:hover,
+  .cl-entry:focus-visible,
+  .mr-card:hover,
+  .mr-card:focus-within,
+  .md-choice:hover,
+  .md-choice:focus-visible,
+  .stat-card:hover,
+  .stat-card:focus-visible,
+  .land-card:hover,
+  .land-card:focus-visible,
+  .land-hero-card:hover,
+  .land-hero-card:focus-visible,
+  .ed-row:hover,
+  .ed-row:focus-within,
+  .tg-tile:active,
+  .rb-design:active,
+  .fj-saved-item:active,
+  .fj-result:active,
+  .ap-entry:active,
+  .cl-entry:active,
+  .mr-card:active,
+  .md-choice:active,
+  .stat-card:active,
+  .land-card:active,
+  .land-hero-card:active,
+  .ed-row:active {
+    transform: none;
+    box-shadow: var(--card-shadow-rest, 0 1px 2px rgba(24, 35, 64, 0.04));
+  }
+}
+
+/* ---------- reduced motion ---------- */
+
+/*
+  Movement is removed; the feedback is not. The border and the shadow
+  still change on hover and the focus ring still appears - a user who
+  has asked for less motion still needs to know what is clickable.
+
+  The lift and the scale are the only things switched off here.
+*/
+
+@media (prefers-reduced-motion: reduce) {
+  .tg-tile,
+  .rb-design,
+  .fj-saved-item,
+  .fj-result,
+  .ap-entry,
+  .cl-entry,
+  .mr-card,
+  .md-choice,
+  .stat-card,
+  .land-card,
+  .ed-row {
+    transition: none;
+  }
+
+  .tg-tile:hover,
+  .rb-design:hover,
+  .rb-design:focus-visible,
+  .fj-saved-item:hover,
+  .fj-result:hover,
+  .fj-result:focus-within,
+  .ap-entry:hover,
+  .ap-entry:focus-within,
+  .cl-entry:hover,
+  .cl-entry:focus-visible,
+  .mr-card:hover,
+  .mr-card:focus-within,
+  .md-choice:hover,
+  .md-choice:focus-visible,
+  .stat-card:hover,
+  .stat-card:focus-visible,
+  .land-card:hover,
+  .land-card:focus-visible,
+  .land-hero-card:hover,
+  .land-hero-card:focus-visible,
+  .ed-row:hover,
+  .ed-row:focus-within,
+  .tg-tile:active,
+  .rb-design:active,
+  .fj-saved-item:active,
+  .fj-result:active,
+  .ap-entry:active,
+  .cl-entry:active,
+  .mr-card:active,
+  .md-choice:active,
+  .stat-card:active,
+  .land-card:active,
+  .land-hero-card:active,
+  .ed-row:active {
+    transform: none;
+  }
+}

@@ -7,6 +7,12 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+# Never the production database, even though this script does not
+# open one today.
+import db_guard  # noqa: E402
+
+db_guard.use_temporary_database()
+
 from extractor import extract_text
 from analyzer import analyze_resume
 

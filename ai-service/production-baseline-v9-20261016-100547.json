@@ -1,0 +1,984 @@
+{
+  "captured_at": "2026-10-16T10:05:47Z",
+  "database": "resumeai.db",
+  "file_sha256": "106517830cf8e4493763299ba6d679562137eb9c85b2c7aa4c8d7f133c1fe2bd",
+  "foreign_key_violations": 0,
+  "integrity_check": "ok",
+  "saved_resume_ids": [
+    4,
+    5
+  ],
+  "size_bytes": 942080,
+  "table_count": 13,
+  "tables": {
+    "application_events": {
+      "columns": [
+        {
+          "name": "id",
+          "notnull": false,
+          "type": "INTEGER"
+        },
+        {
+          "name": "application_id",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "user_id",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "status",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "note",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "event_date",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "created_at",
+          "notnull": true,
+          "type": "TEXT"
+        }
+      ],
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "applications": {
+      "columns": [
+        {
+          "name": "id",
+          "notnull": false,
+          "type": "INTEGER"
+        },
+        {
+          "name": "user_id",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "saved_job_id",
+          "notnull": false,
+          "type": "INTEGER"
+        },
+        {
+          "name": "resume_id",
+          "notnull": false,
+          "type": "INTEGER"
+        },
+        {
+          "name": "mission_id",
+          "notnull": false,
+          "type": "INTEGER"
+        },
+        {
+          "name": "job_title",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "company",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "location",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "work_mode",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "employment",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "salary",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "apply_url",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "status",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "applied_on",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "next_step",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "notes",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "created_at",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "updated_at",
+          "notnull": true,
+          "type": "TEXT"
+        }
+      ],
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "career_missions": {
+      "columns": [
+        {
+          "name": "id",
+          "notnull": false,
+          "type": "INTEGER"
+        },
+        {
+          "name": "user_id",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "role_key",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "role_title",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "job_title",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "job_reference",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "status",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "readiness_json",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "created_at",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "updated_at",
+          "notnull": true,
+          "type": "TEXT"
+        }
+      ],
+      "rows": 2,
+      "sha256": "aefda91f1264c1cdb4cd31d6693f453a36ab0e0c0827c6968acf973cedc38d7b"
+    },
+    "career_profile_education": {
+      "columns": [
+        {
+          "name": "id",
+          "notnull": false,
+          "type": "INTEGER"
+        },
+        {
+          "name": "user_id",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "qualification",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "qualification_detail",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "institution",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "board",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "stream",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "start_year",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "end_year",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "status",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "percentage",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "marks_obtained",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "marks_max",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "cgpa",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "cgpa_scale",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "detail",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "sort_order",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "created_at",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "updated_at",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "location",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "coursework",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "level_type",
+          "notnull": false,
+          "type": "TEXT"
+        }
+      ],
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "career_profile_items": {
+      "columns": [
+        {
+          "name": "id",
+          "notnull": false,
+          "type": "INTEGER"
+        },
+        {
+          "name": "user_id",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "profile_id",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "item_type",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "title",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "organisation",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "location",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "start_date",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "end_date",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "is_current",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "description",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "url",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "sort_order",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "created_at",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "updated_at",
+          "notnull": true,
+          "type": "TEXT"
+        }
+      ],
+      "rows": 2,
+      "sha256": "72cbbbad02cacb6c4bc8037b1dba519710cfa946d2f72d39c6050875fc4da5f6"
+    },
+    "career_profiles": {
+      "columns": [
+        {
+          "name": "id",
+          "notnull": false,
+          "type": "INTEGER"
+        },
+        {
+          "name": "user_id",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "full_name",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "headline",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "email",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "phone",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "location",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "preferred_locations",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "work_arrangement",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "portfolio_url",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "linkedin_url",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "github_url",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "summary",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "interests",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "preferred_roles",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "willing_to_relocate",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "open_to_internship",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "created_at",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "updated_at",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "skills",
+          "notnull": false,
+          "type": "TEXT"
+        }
+      ],
+      "rows": 1,
+      "sha256": "4c9d6681041fe2bf5adb9892452ff18212ada2ee59e46607b9ba7841c5e31918"
+    },
+    "mission_tasks": {
+      "columns": [
+        {
+          "name": "id",
+          "notnull": false,
+          "type": "INTEGER"
+        },
+        {
+          "name": "mission_id",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "user_id",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "task_key",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "title",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "detail",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "category",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "skill",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "importance",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "status",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "sort_order",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "completed_at",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "created_at",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "updated_at",
+          "notnull": true,
+          "type": "TEXT"
+        }
+      ],
+      "rows": 27,
+      "sha256": "9334b5bfe4ac5d34d03bfb9d2631d588ca307b00760cfc12f78a373eef12c4b9"
+    },
+    "resume_analyses": {
+      "columns": [
+        {
+          "name": "id",
+          "notnull": false,
+          "type": "INTEGER"
+        },
+        {
+          "name": "resume_id",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "user_id",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "score",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "ats_score",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "skills_json",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "matched_keywords_json",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "missing_keywords_json",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "suggestions_json",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "weaknesses_json",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "missing_sections_json",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "criteria_json",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "breakdown_json",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "improvement_plan_json",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "job_description",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "result_json",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "created_at",
+          "notnull": true,
+          "type": "TEXT"
+        }
+      ],
+      "rows": 28,
+      "sha256": "5d4fab9cb57fe93f7fee22f0e7b08459afaa31f02cdf342378ab1aa705fc56ff"
+    },
+    "resumes": {
+      "columns": [
+        {
+          "name": "id",
+          "notnull": false,
+          "type": "INTEGER"
+        },
+        {
+          "name": "user_id",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "filename",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "stored_path",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "file_size",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "mime_type",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "text_length",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "text_excerpt",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "uploaded_at",
+          "notnull": true,
+          "type": "TEXT"
+        }
+      ],
+      "rows": 28,
+      "sha256": "f9a8d24135576c9bdac55814ccd4b1dacef10697040dd616bea88abc5b816629"
+    },
+    "saved_jobs": {
+      "columns": [
+        {
+          "name": "id",
+          "notnull": false,
+          "type": "INTEGER"
+        },
+        {
+          "name": "user_id",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "title",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "company",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "location",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "work_mode",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "employment",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "salary",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "source",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "url",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "description",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "posted_on",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "search_query",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "notes",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "created_at",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "updated_at",
+          "notnull": true,
+          "type": "TEXT"
+        }
+      ],
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "saved_resumes": {
+      "columns": [
+        {
+          "name": "id",
+          "notnull": false,
+          "type": "INTEGER"
+        },
+        {
+          "name": "user_id",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "title",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "template_key",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "target_role",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "content_json",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "settings_json",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "created_at",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "updated_at",
+          "notnull": true,
+          "type": "TEXT"
+        }
+      ],
+      "rows": 2,
+      "sha256": "2eb56ca897e118a6ea224d8b7f013ef04c654702283ce22ab70887ac2097e156"
+    },
+    "skill_evidence": {
+      "columns": [
+        {
+          "name": "id",
+          "notnull": false,
+          "type": "INTEGER"
+        },
+        {
+          "name": "user_id",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "kind",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "title",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "description",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "url",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "organisation",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "started_on",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "completed_on",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "skills_json",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "evidence_type",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "verified",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "sort_order",
+          "notnull": true,
+          "type": "INTEGER"
+        },
+        {
+          "name": "created_at",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "updated_at",
+          "notnull": true,
+          "type": "TEXT"
+        }
+      ],
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "users": {
+      "columns": [
+        {
+          "name": "id",
+          "notnull": false,
+          "type": "INTEGER"
+        },
+        {
+          "name": "name",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "email",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "password_hash",
+          "notnull": false,
+          "type": "TEXT"
+        },
+        {
+          "name": "created_at",
+          "notnull": true,
+          "type": "TEXT"
+        },
+        {
+          "name": "session_version",
+          "notnull": true,
+          "type": "INTEGER"
+        }
+      ],
+      "rows": 25,
+      "sha256": "14a1bac322c62c6167ff3d9328b3bab576bd54c0e397505758e13dac8fd479e1"
+    }
+  },
+  "user_version": 9
+}

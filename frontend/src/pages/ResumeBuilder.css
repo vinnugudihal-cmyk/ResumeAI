@@ -1,0 +1,1104 @@
+/* Resume builder: guided editor on the left, live preview right. */
+
+.rb-page {
+  /* Wider and taller than the other pages: this is the one people
+     spend real time in, with the editor on the left and a live
+     document on the right. */
+  max-width: 1560px;
+  margin: 0 auto;
+  padding: 32px 32px 80px;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color: var(--app-text);
+}
+
+.rb-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--app-line);
+}
+
+.rb-header-left {
+  min-width: 0;
+}
+
+.rb-back {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--app-accent);
+  text-decoration: none;
+}
+
+.rb-back:hover {
+  text-decoration: underline;
+}
+
+.rb-title {
+  display: block;
+  width: 100%;
+  max-width: 460px;
+  margin: 6px 0 2px;
+  padding: 4px 8px;
+  font-family: inherit;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--app-text);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  outline: none;
+}
+
+.rb-title:hover {
+  border-color: var(--app-line);
+}
+
+.rb-title:focus {
+  border-color: var(--app-accent);
+  background: var(--app-surface);
+}
+
+.rb-status {
+  margin: 0 0 0 8px;
+  font-size: 12.5px;
+  color: var(--app-muted);
+}
+
+.rb-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ---------- layout ---------- */
+
+/*
+  The two panels.
+
+  Editing on the left, the resume on the right. The preview column is
+  capped at 600px because the resume is rendered at a fixed A4
+  proportion - giving it more width would only make the page scale
+  up and the type larger than the PDF it is previewing, so the editor
+  takes the slack instead. That is what keeps the two usable at the
+  same time on a laptop.
+*/
+.rb-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 600px);
+  gap: 28px;
+  align-items: start;
+}
+
+.rb-editor {
+  min-width: 0;
+}
+
+/* The preview follows you down a long form rather than scrolling
+   away above it. */
+.rb-side {
+  position: sticky;
+  top: 20px;
+  min-width: 0;
+}
+
+/* ---------- cards ---------- */
+
+/*
+  An editing section, not a clickable card: no lift, no accent bar.
+  The card hover in cardHover.css deliberately does not list these -
+  a form panel that moves when the pointer passes over it is noise.
+*/
+.rb-card {
+  padding: 22px;
+  margin-bottom: 16px;
+
+  background: var(--app-surface);
+  border: 1px solid var(--app-line);
+  border-radius: var(--app-radius-lg, 18px);
+
+  box-shadow:
+    0 1px 2px rgba(24, 35, 64, 0.04),
+    0 8px 24px rgba(24, 35, 64, 0.05);
+}
+
+.rb-state {
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.rb-state-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 18px;
+}
+
+.rb-card-title {
+  margin: 0 0 12px;
+  font-size: 15.5px;
+  font-weight: 700;
+}
+
+.rb-count {
+  display: inline-block;
+  min-width: 20px;
+  padding: 1px 7px;
+  font-size: 11.5px;
+  color: var(--app-accent);
+  text-align: center;
+  background: var(--app-accent-soft);
+  border-radius: 999px;
+}
+
+.rb-section-head {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.rb-section-head .rb-card-title {
+  margin: 0;
+}
+
+.rb-hint {
+  margin: -6px 0 12px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--app-muted);
+}
+
+/* ---------- messages ---------- */
+
+.rb-notice {
+  padding: 11px 15px;
+  margin-bottom: 14px;
+  font-size: 13.5px;
+  color: var(--app-success);
+  background: var(--app-success-soft);
+  border: 1px solid var(--app-success-line);
+  border-radius: 10px;
+}
+
+.rb-notice-error {
+  color: var(--app-danger);
+  background: var(--app-danger-soft);
+  border-color: var(--app-danger-line);
+}
+
+.rb-error {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--app-danger);
+}
+
+.rb-empty-line {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  color: var(--app-muted);
+}
+
+.rb-disclaimer {
+  margin: 12px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--app-muted);
+}
+
+/* ---------- forms ---------- */
+
+.rb-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.rb-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+
+.rb-field-block {
+  margin-top: 4px;
+}
+
+.rb-field span {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--app-dim);
+}
+
+/*
+  Form controls.
+
+  Opaque and near-white on purpose. A translucent input sitting on a
+  translucent card on a washed background is three pale layers
+  between the user and the text they are typing - readable when you
+  look at it, tiring when you type a long summary into it. Glass is
+  for panels; a field you write in stays solid.
+*/
+.rb-field input,
+.rb-field select,
+.rb-field textarea,
+.rb-textarea,
+.rb-custom-heading,
+.rb-custom textarea {
+  padding: 10px 12px;
+
+  font-family: inherit;
+  font-size: 13.5px;
+  color: var(--app-text);
+
+  background: var(--app-surface-2);
+  border: 1px solid var(--app-line-strong);
+  border-radius: var(--app-radius-sm, 9px);
+
+  outline: none;
+
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+/* A field that has been typed into is not "empty" any more, so it
+   goes back to full white - a quiet signal that it is filled. */
+.rb-field input:not(:placeholder-shown),
+.rb-field textarea:not(:placeholder-shown) {
+  background: var(--app-surface);
+}
+
+.rb-field textarea,
+.rb-textarea,
+.rb-custom textarea {
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.rb-field input:focus,
+.rb-field select:focus,
+.rb-field textarea:focus,
+.rb-textarea:focus,
+.rb-custom-heading:focus,
+.rb-custom textarea:focus {
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 3px rgba(49, 85, 217, 0.12);
+}
+
+.rb-field input::placeholder,
+.rb-field textarea::placeholder,
+.rb-textarea::placeholder {
+  color: var(--app-faint, #8b93a1);
+}
+
+.rb-textarea {
+  width: 100%;
+}
+
+/* ---------- entries ---------- */
+
+.rb-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rb-entry {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 0;
+  border-top: 1px solid var(--app-line);
+}
+
+.rb-entry-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rb-entry-main strong {
+  font-size: 14px;
+}
+
+.rb-entry-meta {
+  font-size: 12.5px;
+  color: var(--app-muted);
+}
+
+.rb-entry-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 6px;
+  align-items: center;
+}
+
+.rb-draft {
+  padding: 16px;
+  margin-top: 12px;
+  background: var(--app-surface-2);
+  border: 1px solid var(--app-accent-line);
+  border-radius: 11px;
+}
+
+.rb-custom {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 0;
+  border-top: 1px solid var(--app-line);
+}
+
+.rb-custom-heading {
+  font-weight: 600;
+}
+
+.rb-custom button {
+  align-self: flex-start;
+}
+
+/* ---------- suggestions ---------- */
+
+.rb-suggestions {
+  padding: 14px;
+  margin-top: 14px;
+  background: var(--app-surface-2);
+  border: 1px solid var(--app-accent-line);
+  border-radius: 11px;
+}
+
+.rb-suggestions ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rb-suggestions li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--app-line);
+}
+
+.rb-suggestions li:last-child {
+  border-bottom: none;
+}
+
+.rb-suggestions strong {
+  font-size: 13.5px;
+}
+
+.rb-suggestions p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--app-dim);
+}
+
+.rb-suggestions blockquote {
+  margin: 8px 0 0;
+  padding: 7px 11px;
+  font-size: 12.5px;
+  font-style: italic;
+  color: var(--app-muted);
+  background: var(--app-surface);
+  border-left: 3px solid var(--app-accent-line);
+  border-radius: 0 6px 6px 0;
+}
+
+/* ---------- preview side ---------- */
+
+.rb-side-toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.rb-view-toggle {
+  display: flex;
+  gap: 6px;
+}
+
+.rb-chip {
+  padding: 6px 14px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--app-dim);
+  background: var(--app-surface);
+  border: 1px solid var(--app-line-strong);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.rb-chip.active {
+  color: var(--app-accent-ink);
+  background: var(--app-accent);
+  border-color: var(--app-accent);
+}
+
+.rb-side-note {
+  font-size: 12px;
+  color: var(--app-muted);
+}
+
+/*
+  The preview panel.
+
+  A sheet of paper on a desk. The desk is a pale blue-grey wash so
+  the page reads as light blue-white to match the dashboard, and the
+  sheet itself is fully opaque white - deliberately NOT glass.
+
+  A resume is a document. Putting a blur, a 55%-alpha fill or a
+  reflection over the one thing the user is checking their layout
+  against would make it harder to read, and the reflection would
+  print into their eyes every time they scrolled. The glass
+  vocabulary in theme.css is for panels and cards; the resume gets
+  paper.
+*/
+.rb-preview-wrap {
+  padding: 20px;
+  margin-bottom: 16px;
+
+  background:
+    linear-gradient(180deg, var(--app-surface-2) 0%, var(--app-bg) 100%);
+
+  border: 1px solid var(--app-line);
+  border-radius: var(--app-radius-lg, 18px);
+}
+
+.rb-preview {
+  overflow: hidden;
+
+  /* The page: opaque, with a contact shadow that suggests it is
+     lying on the desk rather than painted on it. */
+  background: #ffffff;
+
+  border: 1px solid var(--app-line);
+  border-radius: 8px;
+
+  box-shadow:
+    0 1px 2px rgba(24, 35, 64, 0.05),
+    0 12px 32px rgba(24, 35, 64, 0.10);
+}
+
+.rb-preview-mobile {
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.rb-customise .rb-card-title {
+  font-size: 14px;
+}
+
+.rb-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.rb-swatch {
+  width: 26px;
+  height: 26px;
+  border: 2px solid transparent;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.rb-swatch.active {
+  border-color: var(--app-text);
+  box-shadow: 0 0 0 2px var(--app-surface) inset;
+}
+
+.rb-order {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rb-order li {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--app-line);
+}
+
+.rb-order li.hidden .rb-order-name {
+  color: var(--app-muted);
+  text-decoration: line-through;
+}
+
+.rb-order-name {
+  font-size: 13px;
+}
+
+.rb-order-actions {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+/* ---------- buttons ---------- */
+
+.rb-btn {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  padding: 10px 17px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--app-accent-ink);
+  text-decoration: none;
+  background: var(--app-accent);
+  border: 1px solid var(--app-accent);
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.rb-btn:hover:not(:disabled) {
+  background: var(--app-accent-hover);
+  border-color: var(--app-accent-hover);
+}
+
+.rb-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.rb-btn:focus-visible {
+  outline: 2px solid var(--app-accent);
+  outline-offset: 2px;
+}
+
+.rb-btn-small {
+  padding: 7px 13px;
+  font-size: 12.5px;
+}
+
+.rb-btn-ghost {
+  color: var(--app-dim);
+  background: transparent;
+  border-color: var(--app-line-strong);
+}
+
+.rb-btn-ghost:hover:not(:disabled) {
+  color: var(--app-text);
+  background: var(--app-surface-2);
+  border-color: var(--app-line-strong);
+}
+
+.rb-btn-danger {
+  color: var(--app-danger);
+  background: transparent;
+  border-color: var(--app-danger-line);
+}
+
+.rb-btn-danger:hover:not(:disabled) {
+  color: var(--app-accent-ink);
+  background: var(--app-danger);
+  border-color: var(--app-danger);
+}
+
+.rb-btn-primary {
+  background: var(--app-accent);
+  border-color: var(--app-accent);
+}
+
+.rb-btn-primary:hover {
+  background: var(--app-accent-hover);
+  border-color: var(--app-accent-hover);
+}
+
+.rb-icon {
+  width: 26px;
+  height: 26px;
+  font-size: 13px;
+  color: var(--app-dim);
+  background: var(--app-surface);
+  border: 1px solid var(--app-line-strong);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.rb-icon:hover:not(:disabled) {
+  background: var(--app-surface-2);
+}
+
+.rb-icon:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.rb-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 12px;
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 1024px) {
+  .rb-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .rb-side {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .rb-page {
+    padding: 16px 14px 48px;
+  }
+
+  .rb-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rb-header-actions {
+    width: 100%;
+  }
+
+  .rb-title {
+    font-size: 19px;
+  }
+}
+
+/* ============================================================
+   PHONES
+
+   Editing and previewing on a phone: the preview keeps the full
+   width of the screen so the text stays readable, every form
+   control gets a 16px font (iOS zooms on anything smaller) and a
+   46px target, and the sticky action bar stops covering the
+   last field on the form.
+   ============================================================ */
+
+@media (max-width: 640px) {
+  .rb-page {
+    padding: 16px 14px 64px;
+  }
+
+  .rb-input,
+  .rb-field input,
+  .rb-field select,
+  .rb-field textarea,
+  .rb-textarea {
+    font-size: 16px;
+    min-height: 46px;
+  }
+
+  .rb-textarea {
+    min-height: 110px;
+  }
+
+  .rb-preview-wrap {
+    padding: 12px 8px;
+  }
+
+  /* Let the preview use the whole screen width. A 320px sheet in
+     the middle of a 360px phone wastes the space that makes the
+     text readable at all. */
+  .rb-preview-mobile {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .rb-preview .rp-sheet {
+    font-size: 12px;
+  }
+
+  .rb-preview .rp-name,
+  .rb-preview .rp-banner-name {
+    font-size: 26px;
+  }
+
+  .rb-preview .rp-summary {
+    font-size: 12.5px;
+  }
+
+  .rb-preview .rp-entry-title {
+    font-size: 13px;
+  }
+
+  .rb-preview .rp-bullets li,
+  .rb-preview .rp-skill-line {
+    font-size: 12px;
+  }
+
+  .rb-preview .rp-date,
+  .rb-preview .rp-entry-meta,
+  .rb-preview .rp-contact {
+    font-size: 11px;
+  }
+
+  .rb-swatches {
+    gap: 10px;
+  }
+
+  .rb-swatches button {
+    width: 44px;
+    height: 44px;
+  }
+
+  .rb-header-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .rb-header-actions .rb-btn {
+    width: 100%;
+    min-height: 46px;
+    justify-content: center;
+  }
+
+  .rb-btn {
+    min-height: 44px;
+  }
+
+  /* Entry rows are a title plus four small controls; side by side
+     on a phone that is four sub-44px targets. */
+  .rb-entry,
+  .rb-entry-actions {
+    flex-wrap: wrap;
+  }
+
+  .rb-entry-actions .rb-btn {
+    flex: 1 1 44%;
+    min-height: 44px;
+    justify-content: center;
+  }
+
+  .rb-side-toolbar {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .rb-view-toggle {
+    flex-wrap: wrap;
+  }
+}
+/* =========================================
+   The design picker.
+
+   A searchable grid of design cards, replacing the bare <select>
+   that used to sit here. A dropdown cannot show what a design
+   looks like or how many of them there are, and this page is
+   where someone is choosing one.
+
+   These are name-and-category cards, not rendered thumbnails.
+   A thumbnail is an entire resume drawn in miniature, and
+   drawing 122 of them next to a live editor is what made the
+   gallery page crawl. The full-size preview of the design you
+   pick is already on screen to the left of this list.
+   ========================================= */
+
+.rb-designs {
+  display: block;
+}
+
+.rb-design-search {
+  width: 100%;
+  margin-top: 6px;
+}
+
+.rb-design-grid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 8px;
+  /* Bounded, because there are 122 designs. The whole page
+     should not grow a thousand pixels because of this list. */
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.rb-design {
+  display: block;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--app-surface-2);
+  border: 1px solid var(--app-line);
+  color: var(--app-text);
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease;
+}
+
+.rb-design:hover {
+  background: var(--app-surface-2);
+  border-color: var(--app-line-strong);
+}
+
+.rb-design.active {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: var(--app-text);
+  box-shadow: 0 0 0 1px var(--app-text) inset;
+}
+
+.rb-design:focus-visible {
+  outline: 2px solid var(--app-focus);
+  outline-offset: 2px;
+}
+
+.rb-design-name {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.rb-design-meta {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--app-muted);
+}
+
+.rb-design-empty {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 13px;
+  color: var(--app-muted);
+}
+
+.rb-design-count {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--app-muted);
+}
+
+/* =========================================
+   Stacked layout on a narrow screen.
+
+   The preview drops below the editor instead of being crushed
+   into a sliver beside it.
+   ========================================= */
+
+@media (max-width: 1080px) {
+  .rb-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-side {
+    position: static;
+  }
+}
+
+@media (max-width: 720px) {
+  .rb-page {
+    padding: 20px 16px 56px;
+  }
+}
+/* =========================================
+   The five steps.
+
+   Same treatment as the details form's indicator, so moving from
+   step 1 to step 2 does not feel like leaving the flow.
+   ========================================= */
+
+.rb-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.rb-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px 7px 8px;
+  border-radius: 999px;
+  background: var(--app-surface);
+  border: 1px solid var(--app-line);
+  color: var(--app-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.rb-step.done {
+  color: var(--app-dim);
+}
+
+.rb-step.current {
+  background: var(--app-accent-soft);
+  border-color: var(--app-accent-line);
+  color: var(--app-accent-hover);
+}
+
+.rb-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--app-line);
+  color: var(--app-text);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.rb-step.current .rb-step-num {
+  background: var(--app-accent);
+  color: var(--app-accent-ink);
+}
+
+@media (max-width: 720px) {
+  .rb-steps {
+    margin-bottom: 16px;
+  }
+
+  .rb-step {
+    font-size: 12px;
+    padding: 6px 11px 6px 6px;
+  }
+}
+/* =========================================
+   The gallery thumbnail (TemplateMini).
+
+   A small sheet in the design's own accent and column structure,
+   carrying the person's real words. Purely presentational - every
+   span is a block or inline-block, nothing here is a paragraph,
+   because paragraphs in 124 cards would wreck the layout.
+   ========================================= */
+
+.tm-sheet {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1.414;
+  padding: 7% 8%;
+  background: var(--app-surface);
+  border: 1px solid var(--app-line);
+  border-radius: 4px;
+  overflow: hidden;
+  text-align: left;
+  font-size: 5.5px;
+  line-height: 1.45;
+  color: var(--app-text);
+  pointer-events: none;
+}
+
+/* ---- header ---- */
+
+.tm-header {
+  display: block;
+  padding-bottom: 5%;
+  margin-bottom: 6%;
+  border-bottom: 1px solid var(--app-line);
+}
+
+.tm-header-band {
+  background: var(--tm-accent);
+  border-bottom: none;
+  padding: 6%;
+  margin: -7% -8% 6%;
+  border-radius: 0;
+}
+
+.tm-header-band .tm-name,
+.tm-header-band .tm-headline,
+.tm-header-band .tm-contact {
+  color: #ffffff !important;
+}
+
+.tm-name {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--app-text);
+}
+
+.tm-headline {
+  display: block;
+  margin-top: 1px;
+  font-size: 6px;
+  font-weight: 600;
+  color: var(--tm-accent);
+}
+
+.tm-contact {
+  display: block;
+  margin-top: 2px;
+  font-size: 5px;
+  color: var(--app-muted);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ---- body ---- */
+
+.tm-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6%;
+}
+
+.tm-body-two {
+  flex-direction: row;
+  gap: 8%;
+}
+
+.tm-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6%;
+  flex: 1;
+  min-width: 0;
+}
+
+.tm-section {
+  display: block;
+}
+
+.tm-heading {
+  display: block;
+  font-size: 5.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.tm-text {
+  display: block;
+  color: var(--app-dim);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+/* The card grows taller now that it shows a sheet. */
+.rb-design {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.rb-design-name,
+.rb-design-meta {
+  display: block;
+}

@@ -1,0 +1,54 @@
+{
+  "application_events": {
+    "rows": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "applications": {
+    "rows": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "career_missions": {
+    "rows": 2,
+    "sha256": "aefda91f1264c1cdb4cd31d6693f453a36ab0e0c0827c6968acf973cedc38d7b"
+  },
+  "career_profile_education": {
+    "rows": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "career_profile_items": {
+    "rows": 2,
+    "sha256": "72cbbbad02cacb6c4bc8037b1dba519710cfa946d2f72d39c6050875fc4da5f6"
+  },
+  "career_profiles": {
+    "rows": 1,
+    "sha256": "4c9d6681041fe2bf5adb9892452ff18212ada2ee59e46607b9ba7841c5e31918"
+  },
+  "mission_tasks": {
+    "rows": 27,
+    "sha256": "9334b5bfe4ac5d34d03bfb9d2631d588ca307b00760cfc12f78a373eef12c4b9"
+  },
+  "resume_analyses": {
+    "rows": 28,
+    "sha256": "5d4fab9cb57fe93f7fee22f0e7b08459afaa31f02cdf342378ab1aa705fc56ff"
+  },
+  "resumes": {
+    "rows": 28,
+    "sha256": "f9a8d24135576c9bdac55814ccd4b1dacef10697040dd616bea88abc5b816629"
+  },
+  "saved_jobs": {
+    "rows": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "saved_resumes": {
+    "rows": 2,
+    "sha256": "2eb56ca897e118a6ea224d8b7f013ef04c654702283ce22ab70887ac2097e156"
+  },
+  "skill_evidence": {
+    "rows": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "users": {
+    "rows": 25,
+    "sha256": "87773c0f354b10ef8844ae091939da4751a9152159b88f4fc9294afc392864cd"
+  }
+}

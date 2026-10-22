@@ -1,0 +1,19 @@
+# Production requirements - the WSGI server only.
+#
+# These are deliberately separate from requirements.txt so that a
+# development checkout (`pip install -r requirements.txt`) is not
+# forced to install a serving stack it never uses. The application
+# itself needs nothing here.
+#
+# Windows:
+#     python -m pip install -r requirements-prod.txt
+#     python wsgi.py
+#
+# Linux / macOS: gunicorn is the usual choice there. It is listed
+# only as a comment because it does not install on Windows (it needs
+# fcntl), and this project is run on Windows.
+#
+#     python -m pip install gunicorn
+#     gunicorn --bind 0.0.0.0:8000 --workers 4 wsgi:app
+#
+waitress==3.0.2

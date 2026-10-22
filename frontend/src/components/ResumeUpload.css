@@ -8,7 +8,7 @@
 
 .upload-card {
   width: min(680px, 100%);
-  background: #ffffff;
+  background: var(--app-surface);
   border: 1px solid #e5e7eb;
   border-radius: 22px;
   padding: 30px;
@@ -21,33 +21,27 @@
   gap: 16px;
   margin-bottom: 24px;
 }
-
-.upload-icon-large {
-  width: 48px;
+  .upload-icon-large {width: 48px;
   height: 48px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 14px;
-  background: #eef2ff;
-  color: #3155d9;
+  background: var(--app-accent-soft);
+  color: var(--app-accent);
   font-size: 25px;
-  font-weight: 700;
-}
+  font-weight: 700;}
 
-.upload-card-header h3 {
-  margin: 0 0 7px;
+  .upload-card-header h3 {margin: 0 0 7px;
   font-size: 22px;
-  color: #111827;
-}
+  color: var(--app-text);}
 
-.upload-card-header p {
-  margin: 0;
-  color: #6b7280;
+  .upload-card-header p {margin: 0;
+  color: var(--app-muted);
   font-size: 14px;
-  line-height: 1.6;
-}
+  line-height: 1.6;}
+
 
 /* DROP AREA */
 
@@ -68,7 +62,7 @@
 
 .drop-zone:hover,
 .drop-zone.drag-active {
-  border-color: #3155d9;
+  border-color: var(--app-accent);
   background: #f4f6ff;
 }
 
@@ -83,21 +77,17 @@
   font-size: 27px;
   margin-bottom: 15px;
 }
+  .drop-zone h4 {margin: 0 0 7px;
+  color: var(--app-text);
+  font-size: 17px;}
 
-.drop-zone h4 {
-  margin: 0 0 7px;
-  color: #111827;
-  font-size: 17px;
-}
-
-.drop-zone p {
-  margin: 0 0 10px;
-  color: #64748b;
+  .drop-zone p {margin: 0 0 10px;
+  color: var(--app-muted);
   font-size: 14px;
   max-width: 430px;
   overflow: hidden;
-  text-overflow: ellipsis;
-}
+  text-overflow: ellipsis;}
+
 
 .file-info {
   color: #94a3b8;
@@ -136,54 +126,46 @@
   font-size: 11px;
   font-weight: 800;
 }
-
-.file-details strong {
-  display: block;
-  color: #1f2937;
+  .file-details strong {display: block;
+  color: var(--app-text);
   font-size: 14px;
   max-width: 400px;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
-}
+  white-space: nowrap;}
+
 
 .file-details small {
   display: block;
   margin-top: 4px;
   color: #94a3b8;
 }
-
-.remove-file {
-  border: none;
+  .remove-file {border: none;
   background: #f1f5f9;
-  color: #64748b;
+  color: var(--app-muted);
   width: 32px;
   height: 32px;
   border-radius: 9px;
   cursor: pointer;
-  font-size: 20px;
-}
+  font-size: 20px;}
+
 
 .remove-file:hover {
   background: #fee2e2;
   color: #dc2626;
 }
-
-/* ANALYZE */
-
-.analyze-button {
-  width: 100%;
+  .analyze-button {width: 100%;
   height: 50px;
   margin-top: 18px;
   border: none;
   border-radius: 12px;
-  background: #3155d9;
+  background: var(--app-accent);
   color: white;
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  transition: 0.2s ease;
-}
+  transition: 0.2s ease;}
+
 
 .analyze-button:hover:not(:disabled) {
   background: #2444bd;
@@ -242,36 +224,28 @@
   gap: 20px;
   margin-bottom: 24px;
 }
-
-.section-label,
-.result-card-label {
-  color: #3155d9;
+  .section-label,
+.result-card-label {color: var(--app-accent);
   font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.08em;
-}
+  letter-spacing: 0.08em;}
 
-.results-header h3 {
-  margin: 6px 0;
+  .results-header h3 {margin: 6px 0;
   font-size: 24px;
-  color: #111827;
-}
+  color: var(--app-text);}
 
-.results-header p {
-  margin: 0;
-  color: #64748b;
-  font-size: 14px;
-}
+  .results-header p {margin: 0;
+  color: var(--app-muted);
+  font-size: 14px;}
 
-.new-analysis-button {
-  border: 1px solid #dbe2f0;
+  .new-analysis-button {border: 1px solid #dbe2f0;
   background: white;
-  color: #3155d9;
+  color: var(--app-accent);
   padding: 10px 16px;
   border-radius: 10px;
   font-weight: 700;
-  cursor: pointer;
-}
+  cursor: pointer;}
+
 
 .result-grid {
   display: grid;
@@ -288,24 +262,20 @@
   border-radius: 18px;
   padding: 24px;
 }
-
-.large-score {
-  font-size: 54px;
+  .large-score {font-size: 54px;
   font-weight: 800;
-  color: #111827;
-  margin-top: 15px;
-}
+  color: var(--app-text);
+  margin-top: 15px;}
+
 
 .large-score span {
   font-size: 17px;
   color: #94a3b8;
   font-weight: 500;
 }
+  .score-status {color: var(--app-muted);
+  font-size: 13px;}
 
-.score-status {
-  color: #64748b;
-  font-size: 13px;
-}
 
 .score-progress {
   height: 8px;
@@ -314,44 +284,34 @@
   overflow: hidden;
   margin: 18px 0;
 }
+  .score-progress div {height: 100%;
+  background: var(--app-accent);
+  border-radius: inherit;}
 
-.score-progress div {
-  height: 100%;
-  background: #3155d9;
-  border-radius: inherit;
-}
-
-.result-score-card p,
-.result-info-card p {
-  color: #64748b;
+  .result-score-card p,
+.result-info-card p {color: var(--app-muted);
   font-size: 13px;
-  line-height: 1.6;
-}
+  line-height: 1.6;}
 
-.result-info-card h4,
+  .result-info-card h4,
 .skills-result-card h4,
-.suggestions-result-card h4 {
-  margin: 7px 0;
-  color: #111827;
-  font-size: 18px;
-}
+.suggestions-result-card h4 {margin: 7px 0;
+  color: var(--app-text);
+  font-size: 18px;}
+
 
 .summary-stats {
   display: flex;
   gap: 35px;
   margin-top: 25px;
 }
-
-.summary-stats strong {
-  display: block;
+  .summary-stats strong {display: block;
   font-size: 25px;
-  color: #111827;
-}
+  color: var(--app-text);}
 
-.summary-stats span {
-  color: #64748b;
-  font-size: 12px;
-}
+  .summary-stats span {color: var(--app-muted);
+  font-size: 12px;}
+
 
 .skills-result-card,
 .suggestions-result-card {
@@ -363,12 +323,10 @@
   justify-content: space-between;
   align-items: center;
 }
-
-.skills-count {
-  color: #3155d9;
+  .skills-count {color: var(--app-accent);
   font-size: 12px;
-  font-weight: 700;
-}
+  font-weight: 700;}
+
 
 .skills-list {
   display: flex;
@@ -376,15 +334,13 @@
   gap: 10px;
   margin-top: 20px;
 }
-
-.skill-badge-result {
-  padding: 9px 13px;
+  .skill-badge-result {padding: 9px 13px;
   background: #f1f5ff;
-  color: #3155d9;
+  color: var(--app-accent);
   border-radius: 9px;
   font-size: 13px;
-  font-weight: 600;
-}
+  font-weight: 600;}
+
 
 .suggestions-list {
   margin-top: 18px;
@@ -414,13 +370,11 @@
   justify-content: center;
   font-size: 12px;
 }
-
-.suggestion-item p {
-  margin: 3px 0;
-  color: #475569;
+  .suggestion-item p {margin: 3px 0;
+  color: var(--app-dim);
   font-size: 13px;
-  line-height: 1.5;
-}
+  line-height: 1.5;}
+
 
 
 /* MOBILE */
@@ -462,4 +416,41 @@
   .new-analysis-button {
     width: 100%;
   }
+}
+
+/* ============================================================
+   ANALYSIS STATES
+
+   Three classes the results markup uses had no rule anywhere:
+   the per-group skill label, the "no skills detected" line, and
+   the upload error. The error in particular has to be unmistakably
+   an error, so it carries the danger surface, not just red text.
+   ============================================================ */
+
+.upload-error {
+  margin: 12px 0 0;
+  padding: 11px 15px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--app-danger);
+  background: var(--app-danger-soft);
+  border: 1px solid var(--app-danger-line);
+  border-radius: 10px;
+}
+
+.skills-group-label {
+  width: 100%;
+  margin: 6px 0 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--app-muted);
+}
+
+.skills-empty {
+  margin: 8px 0 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--app-muted);
 }

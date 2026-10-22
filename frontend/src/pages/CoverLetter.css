@@ -1,0 +1,464 @@
+/* Cover letters.
+ *
+ * Built from the shared theme tokens rather than literal colours, so
+ * it matches the rest of the app and follows the palette. The glass
+ * panels are the same restrained treatment the dashboard uses - a
+ * translucent surface and a hairline, not a blur over everything.
+ *
+ * The letter itself is deliberately plain: it is a business letter,
+ * and the PDF that comes out of this is what an employer reads.
+ */
+
+.cl-page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 20px 56px;
+}
+
+.cl-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.cl-header-main {
+  min-width: 0;
+}
+
+.cl-header h1 {
+  margin: 6px 0 4px;
+  font-size: 26px;
+  color: var(--app-text);
+}
+
+/*
+  Back to Dashboard.
+
+  A filled dark-blue button rather than a quiet grey link, as the
+  master prompt asks. It keeps the same 200ms the cards use, so the
+  button and the panel it sits above respond at the same speed.
+  `--app-accent` is the app's blue; the hover step is the darker
+  shade the primary buttons already use, so nothing new is
+  introduced.
+*/
+.cl-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  margin-bottom: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+
+  color: var(--app-accent, #3155d9);
+
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+
+  transition: color 0.18s ease;
+}
+
+.cl-back:hover {
+  color: var(--app-accent-hover, #2447c8);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.cl-back:focus-visible {
+  outline: 2px solid var(--app-focus, #3155d9);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.cl-sub {
+  margin: 0;
+  max-width: 60ch;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--app-dim);
+}
+
+/* ---------------- layout ---------------- */
+
+.cl-layout {
+  display: grid;
+  grid-template-columns: minmax(240px, 320px) 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.cl-card {
+  padding: 18px;
+  border-radius: var(--app-radius);
+  border: 1px solid var(--app-line);
+  background: var(--app-surface);
+  box-shadow: var(--app-shadow);
+
+  /*
+    Hover.
+    
+    Like `.cp-card` on My Details, this card had a resting border and
+    shadow and no hover at all, so it read as a flat panel rather than
+    something you could reach into. Same 2px lift and 200ms timing the
+    rest of the app uses.
+
+    `:focus-within` carries the same weight, because tabbing into the
+    editor's fields never puts the pointer over the card itself.
+  */
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.cl-card:hover,
+.cl-card:focus-within {
+  transform: translateY(-2px);
+  border-color: var(--app-accent-line);
+  box-shadow: var(--app-shadow-raised);
+}
+
+@media (hover: none) {
+  .cl-card:hover,
+  .cl-card:focus-within {
+    transform: none;
+    box-shadow: var(--app-shadow);
+    border-color: var(--app-line);
+  }
+}
+
+.cl-card-title {
+  margin: 0 0 14px;
+  font-size: 16px;
+  color: var(--app-text);
+}
+
+.cl-count {
+  font-size: 12px;
+  color: var(--app-muted);
+  font-weight: 600;
+}
+
+.cl-state {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  padding: 36px;
+}
+
+/* ---------------- notices ---------------- */
+
+.cl-notice,
+.cl-error {
+  margin: 0 0 14px;
+  padding: 11px 14px;
+  border-radius: var(--app-radius);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.cl-notice {
+  border: 1px solid #bbf7d0;
+  background: #f0fdf4;
+  color: #14532d;
+}
+
+.cl-error {
+  border: 1px solid var(--app-danger-line);
+  background: var(--app-danger-soft);
+  color: var(--app-danger);
+}
+
+/* ---------------- the library ---------------- */
+
+.cl-empty {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--app-muted);
+}
+
+.cl-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.cl-entry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--app-line);
+  background: var(--app-surface-2);
+}
+
+.cl-entry.is-open {
+  border-color: var(--app-accent-line);
+  background: var(--app-accent-soft);
+}
+
+.cl-entry-main {
+  display: grid;
+  gap: 2px;
+  flex: 1 1 140px;
+  min-width: 0;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.cl-entry-main strong {
+  font-size: 14px;
+  color: var(--app-text);
+  overflow-wrap: anywhere;
+}
+
+.cl-entry-meta {
+  font-size: 12px;
+  color: var(--app-muted);
+}
+
+.cl-entry-tag {
+  font-size: 11px;
+  color: var(--app-muted);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.cl-entry-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* ---------------- the editor ---------------- */
+
+.cl-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.cl-field {
+  display: grid;
+  gap: 5px;
+  font-size: 13px;
+}
+
+.cl-field > span {
+  color: var(--app-dim);
+  font-weight: 600;
+}
+
+.cl-field-wide {
+  grid-column: 1 / -1;
+}
+
+.cl-field-block {
+  margin-bottom: 12px;
+}
+
+.cl-field input,
+.cl-field select,
+.cl-field textarea {
+  width: 100%;
+  padding: 9px 11px;
+  border-radius: 8px;
+  border: 1px solid var(--app-line-strong);
+  background: #ffffff;
+  color: var(--app-text);
+  font: inherit;
+}
+
+.cl-field textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+
+/* The letter body is the one field that must not be cramped. */
+.cl-field-block textarea {
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.cl-field-hint {
+  font-size: 12px;
+  color: var(--app-muted);
+}
+
+/* ---------------- the AI notice ---------------- */
+
+.cl-ai {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  border-radius: var(--app-radius);
+  border: 1px solid var(--app-line);
+  background: var(--app-surface-2);
+}
+
+.cl-ai.is-ready {
+  border-color: var(--app-accent-line);
+  background: var(--app-accent-soft);
+}
+
+.cl-ai-text {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.cl-ai-text strong {
+  font-size: 13px;
+  color: var(--app-text);
+}
+
+.cl-ai-text p {
+  margin: 3px 0 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--app-dim);
+}
+
+.cl-ai-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ---------------- buttons ---------------- */
+
+.cl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--app-line-strong);
+  background: #ffffff;
+  color: var(--app-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.18s ease;
+}
+
+.cl-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: var(--app-accent);
+  color: var(--app-accent-hover);
+}
+
+.cl-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.cl-btn:focus-visible {
+  outline: 2px solid var(--app-focus);
+  outline-offset: 2px;
+}
+
+.cl-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cl-btn-small {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.cl-btn-primary {
+  background: var(--app-accent);
+  border-color: var(--app-accent);
+  color: var(--app-accent-ink);
+}
+
+.cl-btn-primary:hover:not(:disabled) {
+  background: var(--app-accent-hover);
+  border-color: var(--app-accent-hover);
+  color: var(--app-accent-ink);
+}
+
+.cl-btn-ghost {
+  background: transparent;
+  border-color: var(--app-line);
+  color: var(--app-dim);
+}
+
+.cl-btn-danger {
+  color: var(--app-danger);
+  border-color: var(--app-danger-line);
+  background: var(--app-danger-soft);
+}
+
+.cl-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* ---------------- narrow screens ---------------- */
+
+@media (max-width: 860px) {
+  .cl-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .cl-page {
+    padding: 20px 14px 44px;
+  }
+
+  .cl-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cl-header h1 {
+    font-size: 22px;
+  }
+}
+
+/* ---------------- reduced motion ---------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .cl-btn,
+  .cl-btn:hover,
+  .cl-btn:active {
+    transition: none;
+    transform: none;
+  }
+
+  .cl-card,
+  .cl-card:hover,
+  .cl-card:focus-within {
+    transform: none;
+    transition: none;
+  }
+}

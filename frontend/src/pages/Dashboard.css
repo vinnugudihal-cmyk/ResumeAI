@@ -11,8 +11,13 @@
   min-height: 100vh;
   width: 100%;
   display: flex;
-  background: #f7f8fc;
-  color: #111827;
+
+  /* Transparent, so the pale blue washes painted on <body> in
+     theme.css show through the whole app shell. This used to be a
+     flat `#f7f8fc` that painted over them. */
+  background: transparent;
+
+  color: #1e293b;
   font-family:
     Inter,
     -apple-system,
@@ -1560,73 +1565,25 @@
   box-shadow: 0 0 0 3px rgba(49, 85, 217, 0.1);
 }
 
-.job-match-results {
-  margin-top: 20px;
-  padding: 20px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-}
-
-.job-match-header {
+.job-match-cta {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 15px;
-  margin-bottom: 16px;
   flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
 }
 
-.match-score-pill {
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 800;
-}
-
-.match-score-pill.high {
-  background: #ecfdf5;
-  color: #059669;
-}
-
-.match-score-pill.medium {
-  background: #fffbeb;
-  color: #d97706;
-}
-
-.match-score-pill.low {
-  background: #fef2f2;
-  color: #dc2626;
-}
-
-.matched-skills-group {
-  margin-bottom: 14px;
-}
-
-.matched-skills-group strong {
-  display: block;
-  font-size: 13px;
-  color: #475569;
-  margin-bottom: 8px;
+.job-match-cta-note {
+  flex: 1 1 320px;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #64748b;
 }
 
 .skills-pill-row {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-}
-
-.pill-matched {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 11px;
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  color: #047857;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 700;
 }
 
 .pill-missing {
@@ -2109,6 +2066,41 @@
   font-weight: 800;
 }
 
+/* Explainable comparison lists: what improved and what is still
+   open, both read from the two stored analyses. */
+.comparison-list {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.comparison-list-title {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.comparison-list-title.improved {
+  color: #059669;
+}
+
+.comparison-list-title.open {
+  color: #b45309;
+}
+
+.comparison-list ul {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #475569;
+}
+
+.comparison-list-note {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
 /* Delta badges */
 .delta-badge {
   display: inline-flex;
@@ -2195,4 +2187,146 @@
     align-items: flex-start;
     gap: 6px;
   }
+}
+
+/* ============================================================
+   RESTORED WIDGET RULES
+
+   The ATS component breakdown and the skill tags are rendered by
+   this page but had no rules left in this stylesheet, so the bars,
+   the weight labels and the tag pills all fell back to defaults.
+   These are re-read verbatim from the pre-damage snapshot; only the
+   selectors that no longer existed have been added, so nothing that
+   the newer dashboard design already declares is touched.
+   ============================================================ */
+
+.ats-components {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ats-component {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ats-component-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ats-component-label {
+  color: var(--app-text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ats-component-weight {
+  color: var(--app-faint);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.ats-component-bar {
+  height: 7px;
+  border-radius: 999px;
+  background: var(--app-surface-2);
+  overflow: hidden;
+}
+
+.ats-component-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--app-accent), #6b7ef0);
+}
+
+.ats-component-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--app-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ats-disclaimer {
+  margin: 16px 0 0;
+  padding: 11px 13px;
+  border-left: 3px solid var(--app-accent-line);
+  border-radius: 0 8px 8px 0;
+  background: var(--app-surface-2);
+  color: var(--app-muted);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.role-panel-divider {
+  height: 1px;
+  margin: 20px 0;
+  background: var(--app-line);
+}
+
+.skill-tag-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.skill-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border: 1px solid var(--app-line-strong);
+  border-radius: 999px;
+  background: var(--app-surface-2);
+  color: var(--app-dim);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.35;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.skill-tag:hover {
+  background: var(--app-accent-soft);
+  border-color: var(--app-accent-line);
+}
+
+.skill-tag-dot {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 6px;
+  border-radius: 50%;
+  background: var(--app-accent);
+}
+
+.feature-soon {
+  margin-top: 18px;
+  font-size: 13px;
+  color: var(--app-muted);
+}
+
+.feature-soon summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--app-dim);
+  padding: 8px 0;
+}
+
+.feature-soon ul {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  line-height: 1.7;
 }

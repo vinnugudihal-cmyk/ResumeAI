@@ -1,0 +1,522 @@
+/* Interview practice.
+ *
+ * Same tokens as the rest of the app, so it sits with the cover
+ * letter page and the dashboard rather than beside them.
+ *
+ * The answer boxes are deliberately the largest thing on the screen.
+ * This page is for typing a response, not for reading instructions,
+ * and the layout follows that.
+ */
+
+.ip-page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 20px 56px;
+}
+
+.ip-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.ip-header h1 {
+  margin: 6px 0 4px;
+  font-size: 26px;
+  color: var(--app-text);
+}
+
+.ip-back {
+  font-size: 13px;
+  color: var(--app-muted);
+  text-decoration: none;
+}
+
+.ip-back:hover {
+  color: var(--app-accent);
+}
+
+.ip-sub {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--app-dim);
+}
+
+/* ---------------- layout ---------------- */
+
+.ip-layout {
+  display: grid;
+  grid-template-columns: minmax(230px, 300px) 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.ip-card {
+  padding: 18px;
+  border-radius: var(--app-radius);
+  border: 1px solid var(--app-line);
+  background: var(--app-surface);
+  box-shadow: var(--app-shadow);
+}
+
+.ip-card-title {
+  margin: 0 0 14px;
+  font-size: 16px;
+  color: var(--app-text);
+}
+
+.ip-count {
+  font-size: 12px;
+  color: var(--app-muted);
+  font-weight: 600;
+}
+
+.ip-state {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  padding: 36px;
+}
+
+/* ---------------- notices ---------------- */
+
+.ip-notice,
+.ip-error {
+  margin: 0 0 14px;
+  padding: 11px 14px;
+  border-radius: var(--app-radius);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.ip-notice {
+  border: 1px solid #bbf7d0;
+  background: #f0fdf4;
+  color: #14532d;
+}
+
+.ip-error {
+  border: 1px solid var(--app-danger-line);
+  background: var(--app-danger-soft);
+  color: var(--app-danger);
+}
+
+/* ---------------- provider state ---------------- */
+
+.ip-ai {
+  margin: 0 0 18px;
+  padding: 13px 15px;
+  border-radius: var(--app-radius);
+  border: 1px solid var(--app-line);
+  background: var(--app-surface-2);
+}
+
+.ip-ai.is-ready {
+  border-color: var(--app-accent-line);
+  background: var(--app-accent-soft);
+}
+
+.ip-ai-text strong {
+  font-size: 13px;
+  color: var(--app-text);
+}
+
+.ip-ai-text p {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--app-dim);
+}
+
+/* ---------------- the session library ---------------- */
+
+.ip-empty {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--app-muted);
+}
+
+.ip-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.ip-entry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--app-line);
+  background: var(--app-surface-2);
+}
+
+.ip-entry.is-open {
+  border-color: var(--app-accent-line);
+  background: var(--app-accent-soft);
+}
+
+.ip-entry-main {
+  display: grid;
+  gap: 2px;
+  flex: 1 1 120px;
+  min-width: 0;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ip-entry-main strong {
+  font-size: 14px;
+  color: var(--app-text);
+  overflow-wrap: anywhere;
+}
+
+.ip-entry-meta {
+  font-size: 12px;
+  color: var(--app-muted);
+}
+
+.ip-entry-tag {
+  font-size: 11px;
+  font-weight: 600;
+  color: #15803d;
+}
+
+/* ---------------- forms ---------------- */
+
+.ip-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.ip-field {
+  display: grid;
+  gap: 5px;
+  font-size: 13px;
+}
+
+.ip-field > span {
+  color: var(--app-dim);
+  font-weight: 600;
+}
+
+.ip-field-wide {
+  grid-column: 1 / -1;
+}
+
+.ip-field input,
+.ip-field select,
+.ip-field textarea {
+  width: 100%;
+  padding: 9px 11px;
+  border-radius: 8px;
+  border: 1px solid var(--app-line-strong);
+  background: #ffffff;
+  color: var(--app-text);
+  font: inherit;
+}
+
+.ip-field textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.ip-field input:focus-visible,
+.ip-field select:focus-visible,
+.ip-field textarea:focus-visible,
+.ip-answer:focus-visible {
+  outline: 2px solid var(--app-focus);
+  outline-offset: 1px;
+  border-color: var(--app-accent);
+}
+
+/* ---------------- session header ---------------- */
+
+.ip-session-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ip-session-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ip-progress {
+  margin: 12px 0 16px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--app-muted);
+}
+
+/* ---------------- add a question ---------------- */
+
+.ip-add {
+  padding: 14px;
+  margin-bottom: 18px;
+  border-radius: 10px;
+  border: 1px dashed var(--app-line-strong);
+  background: var(--app-surface-2);
+}
+
+.ip-add-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.ip-add-row .ip-field {
+  flex: 1 1 150px;
+}
+
+/* ---------------- questions ---------------- */
+
+.ip-questions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.ip-question {
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid var(--app-line);
+  background: var(--app-surface-2);
+}
+
+.ip-question-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.ip-question-number {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--app-accent-soft);
+  color: var(--app-accent-hover);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ip-question-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ip-question-prompt {
+  margin: 2px 0 3px;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--app-text);
+  font-weight: 600;
+}
+
+.ip-question-meta {
+  font-size: 11.5px;
+  color: var(--app-muted);
+}
+
+/* The answer box is the point of the page, so it gets the room. */
+.ip-answer {
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--app-line-strong);
+  background: #ffffff;
+  color: var(--app-text);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.7;
+  resize: vertical;
+}
+
+.ip-question-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+/* ---------------- revealed hints and feedback ---------------- */
+
+.ip-revealed,
+.ip-feedback {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--app-accent-line);
+  background: var(--app-accent-soft);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--app-dim);
+}
+
+.ip-revealed p {
+  margin: 0 0 6px;
+}
+
+.ip-revealed p:last-child {
+  margin-bottom: 0;
+}
+
+.ip-revealed strong {
+  color: var(--app-text);
+}
+
+.ip-feedback-title {
+  margin: 0 0 6px;
+  font-weight: 700;
+  color: var(--app-text);
+  font-size: 12.5px;
+}
+
+.ip-feedback pre {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--app-dim);
+}
+
+/* ---------------- buttons ---------------- */
+
+.ip-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--app-line-strong);
+  background: #ffffff;
+  color: var(--app-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.18s ease;
+}
+
+.ip-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: var(--app-accent);
+  color: var(--app-accent-hover);
+}
+
+.ip-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.ip-btn:focus-visible {
+  outline: 2px solid var(--app-focus);
+  outline-offset: 2px;
+}
+
+.ip-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ip-btn-small {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.ip-btn-primary {
+  background: var(--app-accent);
+  border-color: var(--app-accent);
+  color: var(--app-accent-ink);
+}
+
+.ip-btn-primary:hover:not(:disabled) {
+  background: var(--app-accent-hover);
+  border-color: var(--app-accent-hover);
+  color: var(--app-accent-ink);
+}
+
+.ip-btn-ghost {
+  background: transparent;
+  border-color: var(--app-line);
+  color: var(--app-dim);
+}
+
+.ip-btn-danger {
+  color: var(--app-danger);
+  border-color: var(--app-danger-line);
+  background: var(--app-danger-soft);
+}
+
+.ip-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ---------------- narrow screens ---------------- */
+
+@media (max-width: 880px) {
+  .ip-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .ip-page {
+    padding: 20px 14px 44px;
+  }
+
+  .ip-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ip-header h1 {
+    font-size: 22px;
+  }
+}
+
+/* ---------------- reduced motion ---------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .ip-btn,
+  .ip-btn:hover,
+  .ip-btn:active {
+    transition: none;
+    transform: none;
+  }
+}

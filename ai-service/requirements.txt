@@ -6,3 +6,15 @@ Flask==3.1.3
 flask-cors==6.0.5
 pypdf==6.18.1
 python-dotenv==1.2.3
+
+# PDF rendering and OCR for scanned / image-only resumes.
+# PyMuPDF renders each page to an image; RapidOCR reads the
+# text. Both install with pip and need no external program.
+PyMuPDF==1.28.2
+rapidocr-onnxruntime==1.2.3
+
+# Optional second OCR engine. pytesseract is already listed
+# for compatibility, but it only works once the Tesseract
+# binary is installed separately, so ResumeAI falls back to
+# RapidOCR when it is missing.
+pytesseract==0.3.13

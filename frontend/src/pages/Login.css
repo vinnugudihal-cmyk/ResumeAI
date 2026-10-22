@@ -6,8 +6,15 @@
   min-height: 100vh;
   width: 100%;
   display: flex;
+
+  /* Centres the card in the viewport. The column direction keeps it
+     on the vertical centre line and would stack any future sibling
+     beneath it rather than beside it. */
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 18px;
+  padding: 40px 20px;
 
   background:
     radial-gradient(circle at 15% 20%, rgba(99, 102, 241, 0.25), transparent 30%),
@@ -63,24 +70,6 @@
 
   position: relative;
   z-index: 2;
-}
-
-/* Top Back link */
-.back-home-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 18px;
-  color: #64748b;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 600;
-  transition: 0.2s ease;
-}
-
-.back-home-link:hover {
-  color: #4f46e5;
-  transform: translateX(-2px);
 }
 
 /* Logo */
@@ -206,6 +195,22 @@
   color: #1e3a8a;
 }
 
+/* The eye / eye-off glyph, drawn as inline SVG. Without a size the
+   <svg> would fall back to the browser default box, so it is given
+   an explicit square and told to follow the button's colour. */
+.eye-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+  pointer-events: none;
+}
+
+.toggle-password-btn:focus-visible {
+  outline: 2px solid #4f46e5;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
 .input-group input:focus {
   border-color: #4f46e5;
 
@@ -277,24 +282,97 @@
   transform: translateY(0);
 }
 
-/* Demo login button */
-.demo-login-button {
+/*
+  The in-form switch between Sign In and Create Account.
+
+  It is a text button, quieter than the primary submit beside it, so
+  the two are not read as two ways to do the same thing. It had no
+  styling at all before this, which left it looking like a stray
+  sentence under the button.
+*/
+.login-switch {
   width: 100%;
-  margin-top: 10px;
-  padding: 12px;
-  border: 1px dashed #93c5fd;
-  border-radius: 10px;
-  background: #f0f7ff;
-  color: #2563eb;
-  font-size: 14px;
+  margin-top: 14px;
+  padding: 6px;
+
+  border: none;
+  background: none;
+
+  color: #4f46e5;
+  font-size: 13.5px;
   font-weight: 600;
+  text-align: center;
+
   cursor: pointer;
-  transition: 0.2s ease;
+  border-radius: 8px;
+
+  transition: color 0.2s ease, background-color 0.2s ease;
 }
 
-.demo-login-button:hover {
-  background: #e0f0fe;
-  border-color: #3b82f6;
+.login-switch:hover {
+  color: #4338ca;
+  background: #eef2ff;
+}
+
+.login-switch:focus-visible {
+  outline: 2px solid #4f46e5;
+  outline-offset: 2px;
+}
+
+/*
+  "New to ResumeAI? Create Account" under the Sign In button.
+
+  The question is quiet grey; the action is a blue text link. It is a
+  <button> rather than an <a> because registration is the same
+  component in another mode, not a second URL - and a link that
+  changed the address without changing the form would be a lie.
+
+  Deliberately no pseudo-element and no left border: the link may only
+  change colour and gain an underline on hover.
+*/
+.login-register-prompt {
+  margin: 14px 0 0;
+  text-align: center;
+
+  font-size: 13.5px;
+  line-height: 1.5;
+
+  color: #64748b;
+}
+
+.login-register-quiet {
+  color: #64748b;
+}
+
+.login-register-link {
+  display: inline;
+
+  margin: 0;
+  padding: 0;
+
+  border: 0;
+  border-radius: 4px;
+  background: none;
+
+  color: #2563eb;
+  font: inherit;
+  font-weight: 600;
+
+  cursor: pointer;
+  text-decoration: none;
+
+  transition: color 0.2s ease;
+}
+
+.login-register-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.login-register-link:focus-visible {
+  outline: 2px solid #4f46e5;
+  outline-offset: 2px;
 }
 
 /* Footer */

@@ -1,0 +1,162 @@
+/*
+ * Analyse My Resume - the page frame.
+ *
+ * The upload component inside it (ResumeUpload.css) keeps its own
+ * drop zone, button and result layout. This file gives the page a
+ * full-height main area, a large heading block, and a readable
+ * measure so nothing is squeezed into a dashboard card.
+ */
+
+.ar-page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 40px 28px 72px;
+  width: 100%;
+}
+
+/* ---- heading block ---- */
+
+/*
+ * The other pages outside the dashboard use the same "back" link
+ * pattern, so leaving this page does not need the sidebar.
+ */
+.ar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 22px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--app-accent, #3155d9);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.18s ease;
+}
+
+.ar-back:hover {
+  color: var(--app-accent-hover, #2447c8);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.ar-back:focus-visible {
+  outline: 2px solid var(--app-focus, #3155d9);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.ar-head {
+  margin-bottom: 28px;
+}
+
+.ar-eyebrow {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--app-muted);
+}
+
+.ar-title {
+  margin: 0 0 14px;
+  font-size: clamp(30px, 4.4vw, 46px);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.ar-sub {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--app-muted);
+}
+
+/* The three facts under the heading. Stacks on narrow screens. */
+.ar-facts {
+  list-style: none;
+  margin: 26px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+.ar-facts li {
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--app-surface-2);
+  border: 1px solid var(--app-line);
+}
+
+.ar-facts strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--app-text);
+  margin-bottom: 4px;
+}
+
+.ar-facts span {
+  display: block;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--app-muted);
+}
+
+/* ---- post-analysis navigation ---- */
+
+.ar-actions {
+  margin-top: 28px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ar-btn {
+  border-radius: 999px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.ar-btn-ghost {
+  background: transparent;
+  color: var(--app-text);
+  border: 1px solid var(--app-line-strong);
+}
+
+.ar-btn-ghost:hover {
+  background: var(--app-surface-2);
+}
+
+.ar-btn:active {
+  transform: translateY(1px);
+}
+
+.ar-btn:focus-visible {
+  outline: 2px solid var(--app-focus);
+  outline-offset: 3px;
+}
+
+/* ---- responsive ---- */
+
+@media (max-width: 720px) {
+  .ar-page {
+    padding: 24px 16px 56px;
+  }
+
+  .ar-facts {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,352 @@
+/* =========================================
+   ResumeAI - shared design tokens
+   =========================================
+
+   THIS FILE IS TOKENS ONLY, plus one page-background rule and one
+   `@supports` fallback at the bottom.
+
+   It used to be 1128 lines and carried a component layer with it:
+   shared rules for .primary-btn, .nav-item, .page-head, .eyebrow,
+   .badge, .empty-state, select, textarea, and a "one hover for the
+   whole app" block that forced every card and tile to lift by
+   exactly -2px.
+
+   That layer is gone. It was imported last from main.jsx, so it won
+   on every shared property and quietly replaced the original styling
+   on pages whose own CSS had declared it first. The original
+   hover behaviour is declared per component in that component's own
+   stylesheet again, which is where it was written and where it should
+   be read.
+
+   Every token NAME below is load-bearing. Twenty-five stylesheets
+   read var(--app-*) and a handful read var(--land-*); removing or
+   renaming one does not fail the build, it silently resolves to
+   nothing and the page renders unstyled. Adding tokens is safe.
+   Changing VALUES is what this revision does.
+
+   ---------------------------------------------------------------
+   PALETTE: light monochrome
+   ---------------------------------------------------------------
+
+   The accent used to be #3155d9 blue, taken from Dashboard.css at
+   HEAD where it appeared 30 times. That is now near-black. Blue
+   appeared on links, buttons, focus rings, badges and hover bars all
+   over the app, so recolouring the accent is what actually makes the
+   interface monochrome - editing 25 stylesheets would not have.
+
+   Everything is black, white or a neutral grey. Semantic colours
+   (success / warning / danger) are kept because a red error that does
+   not look red is a worse bug than an off-palette one, but each is
+   muted so they sit inside a monochrome page instead of shouting.
+   ========================================= */
+
+:root {
+  /* Surfaces. Off-white page, white cards. */
+  --app-bg: #f4f7fb;
+  --app-bg-2: #eaf0f9;
+  --app-surface: #ffffff;
+  --app-surface-2: #f7faff;
+
+  /* Hairlines - silver, not blue-grey. */
+  --app-line: #e3e8f1;
+  --app-line-strong: #c8d2e4;
+
+  /* Ink. #14181f on white is about 16.5:1, so body text is far
+     above the 4.5:1 minimum even at the dimmest weight. */
+  --app-text: #14181f;
+  --app-navy: #0b0d11;
+  --app-navy-2: #1c212b;
+  --app-dim: #454c59;
+  --app-muted: #626a77;
+  --app-faint: #8b93a1;
+
+  /* The accent, now near-black.
+
+     White ink on this is about 16.9:1. It is used for filled
+     buttons, links, focus rings and hover bars - all of which read
+     as "interactive" just as well in black as they did in blue,
+     and none of them now add colour to the page. */
+  --app-accent: #3155d9;
+  --app-accent-hover: #2447c8;
+  --app-accent-ink: #ffffff;
+  --app-accent-soft: #eef2ff;
+  --app-accent-line: #c7d2fe;
+  --app-focus: #3155d9;
+
+  /* Semantic. Muted, but still unmistakably themselves. */
+  --app-success: #0f7a52;
+  --app-success-soft: #eef7f3;
+  --app-success-line: #b7dfcd;
+  --app-warning: #9a6207;
+  --app-warning-soft: #fdf6ea;
+  --app-warning-line: #f0d9ac;
+  --app-danger: #a51d1d;
+  --app-danger-soft: #fdf1f1;
+  --app-danger-line: #f0c4c4;
+
+  /* Radii. Slightly larger than before: glass reads as soft, and a
+     10px radius on a translucent panel looks tight next to a 14px
+     opaque one. */
+  --app-radius: 12px;
+  --app-radius-sm: 9px;
+  --app-radius-lg: 18px;
+  --app-radius-pill: 999px;
+
+  /* Elevation. Neutral black, no blue cast. */
+  --app-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --app-shadow-raised: 0 8px 24px rgba(0, 0, 0, 0.07);
+
+  /* Type scale. */
+  --fs-display: 30px;
+  --fs-h2: 20px;
+  --fs-h3: 16px;
+  --fs-body: 14px;
+  --fs-sm: 13px;
+  --fs-xs: 12px;
+  --fs-2xs: 11px;
+
+  --lh-tight: 1.2;
+  --lh-snug: 1.35;
+  --lh-body: 1.6;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semi: 600;
+  --fw-bold: 700;
+
+  /* Spacing. */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+
+  --app-maxw: 1200px;
+  --app-gutter: 24px;
+
+  /* Hover emphasis. The lift was 1px at `transition: 0.2s ease`
+     across .primary-btn:hover, .stat-card:hover and .nav-item:hover
+     at HEAD; the values here are the same idea at the new scale. */
+  --app-hover-scale: 1;
+  --app-hover-lift: -2px;
+  --app-hover-dur: 200ms;
+  --app-hover-ease: ease;
+
+  /* `--app-hover-bar` and `--app-hover-bar-color` used to sit here.
+     They defined the 4px accent stripe that cards grew down their
+     left edge on hover. That stripe has been removed - ten cards
+     each drawing a bright line down the same edge turned a grid of
+     quiet tools into a list of warnings - and nothing referenced
+     these two tokens at the time they were deleted, so they are gone
+     rather than left behind as an invitation to rebuild it. The
+     hover vocabulary that replaced it is further down this file. */
+
+  --app-hover-shadow: 0 6px 18px rgba(0, 0, 0, 0.10);
+
+  /* Fonts: Inter, as App.css has always imported it. */
+  --app-font: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
+  --app-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo,
+    Consolas, monospace;
+
+  /* The dashboard launcher's aliases. Kept because Landing.css reads
+     them by name. */
+  --land-bg: #f4f7fb;
+  --land-surface: #ffffff;
+  --land-ink: #0b0d11;
+  --land-text: #14181f;
+  --land-dim: #626a77;
+  --land-line: #e3e8f1;
+  --land-accent: #3155d9;
+  --land-accent-soft: #eef2ff;
+  --land-surface-hi: #f7faff;
+  --land-line-hi: #c7d2fe;
+
+  /* ============================================================
+     LIQUID GLASS
+
+     A separate vocabulary, so a panel can be glass without every
+     card on the page being glass. Panels use these; ordinary cards
+     keep using --app-surface, which stays fully opaque.
+
+     Form controls deliberately do NOT use these. An input has to be
+     readable while you type into it, and a translucent field on a
+     translucent field on a translucent card is three layers of
+     near-white between the user and the text.
+     ============================================================ */
+
+  --glass-radius: 18px;
+
+  /* The blur itself. Two properties because Safari needs the
+     -webkit- prefix; the fallback block below covers engines with
+     neither. */
+  --glass-blur: 20px;
+  --glass-saturate: 170%;
+
+  /* Fill. Alpha, not opacity - the blur does the softening. */
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-bg-strong: rgba(255, 255, 255, 0.74);
+  --glass-bg-hover: rgba(255, 255, 255, 0.66);
+
+  /* Hairline. Two layers: a white inner edge that catches the light
+     at the top, and a dark outer edge that separates the panel from
+     whatever is behind it. */
+  --glass-edge: rgba(255, 255, 255, 0.70);
+  --glass-rim: rgba(11, 13, 17, 0.09);
+
+  /* The soft inner highlight along the top edge - the single detail
+     that reads most as "glass" rather than "translucent box". */
+  --glass-inner: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+
+  /* Layered shadow: a tight contact shadow plus a wide soft one. */
+  --glass-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 10px 30px rgba(0, 0, 0, 0.06);
+  --glass-shadow-hover:
+    0 2px 6px rgba(0, 0, 0, 0.06),
+    0 22px 50px rgba(0, 0, 0, 0.10);
+
+  /* One diagonal reflection, fixed angle so a grid of panels does
+     not shimmer. Subtle on purpose: at 0.55 alpha it catches the
+     eye; higher, it looks like a plastic sheet. */
+  --glass-reflection: linear-gradient(
+    157deg,
+    rgba(255, 255, 255, 0.70) 0%,
+    rgba(255, 255, 255, 0.18) 38%,
+    rgba(255, 255, 255, 0) 62%
+  );
+
+  /* Bubble highlights: the small floating dots of light behind the
+     glass. Used by the page background below, not by panels. */
+  --bubble-1: 42px;
+  --bubble-2: 68px;
+  --bubble-3: 26px;
+
+  --glass-dur: 240ms;
+  --glass-ease: cubic-bezier(0.2, 0, 0, 1);
+
+  /* ============================================================
+     THE SHARED CARD HOVER
+
+     One vocabulary for every clickable card in the app, so the
+     dashboard, the template galleries, saved resumes, saved jobs,
+     applications and cover letters all respond the same way.
+
+     Read only by `cardHover.css`, which lists the card classes
+     explicitly - no broad selectors, so a form panel or a plain
+     text row can never pick this up by accident.
+
+     There is no left accent strip any more. The hover is carried by
+     the lift, the softened border and a layered shadow with a faint
+     glass highlight along the top edge. The highlight is an inset
+     shadow, so it never sits over the card's text.
+     ============================================================ */
+
+  /* Border and shadow at rest vs. on hover. */
+  --card-hover-border: #c7d2fe;
+  --card-shadow-rest: 0 1px 2px rgba(24, 35, 64, 0.04);
+
+  /* A layered shadow: a tight contact shadow so the card still sits
+     on the page, a soft blue-tinted spread that makes the lift
+     visible, and a 1px white inset along the top edge that reads as
+     light catching glass. No spread, no glow behind the card. */
+  --card-hover-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 2px 6px rgba(24, 35, 64, 0.06),
+    0 12px 28px rgba(49, 85, 217, 0.14),
+    0 26px 48px rgba(24, 35, 64, 0.07);
+
+  /* Movement and speed. */
+  --card-hover-lift: -5px;
+  --card-hover-dur: 240ms;
+  --card-hover-ease: cubic-bezier(0.2, 0, 0, 1);
+
+  /* The very small scale the roomy dashboard cards add on top of the
+     lift. Dense template grids do not use it - a scaled tile in a
+     tight grid touches its neighbour. */
+  --card-hover-scale: 1.01;
+}
+
+/* ============================================================
+   PAGE BACKGROUND
+
+   The one non-token rule in this file.
+
+   Glass needs something behind it. Blurring a flat #f4f5f7 produces
+   a flat #f4f5f7, and the panels look like tinted plastic rather
+   than glass - the effect comes from what passes through the blur,
+   so the page needs slow, very low-contrast shapes for the light to
+   bend around.
+
+   Three off-white and one near-black wash, all under 7% opacity, in
+   fixed positions so they do not move between pages. This is
+   painted on <body>, which every route sits inside.
+
+   `.dashboard` sets its own background and will cover this on the
+   dashboard route until Stage 3 reconciles the two.
+   ============================================================ */
+
+body {
+  background-color: var(--app-bg);
+  background-image:
+    radial-gradient(
+      720px 540px at 10% -10%,
+      rgba(255, 255, 255, 0.95),
+      rgba(255, 255, 255, 0) 62%
+    ),
+    radial-gradient(
+      620px 480px at 88% 2%,
+      rgba(49, 85, 217, 0.055),
+      rgba(49, 85, 217, 0) 64%
+    ),
+    radial-gradient(
+      700px 520px at 74% 98%,
+      rgba(49, 85, 217, 0.045),
+      rgba(49, 85, 217, 0) 60%
+    ),
+    radial-gradient(
+      420px 340px at 22% 84%,
+      rgba(255, 255, 255, 0.75),
+      rgba(255, 255, 255, 0) 62%
+    );
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+/* ============================================================
+   NO BACKDROP-FILTER
+
+   Firefox before 103, older Edge and anything with the feature
+   disabled get opaque panels instead of transparent ones. The point
+   is that text stays readable: an alpha fill with no blur behind it
+   would put body text straight onto the page's gradient, which is
+   how "glass" designs become unreadable on old browsers.
+
+   The tokens are overridden, not the components, so no stylesheet
+   needs to know whether the feature exists.
+   ============================================================ */
+
+@supports not ((backdrop-filter: blur(1px)) or
+               (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --glass-bg: #ffffff;
+    --glass-bg-strong: #ffffff;
+    --glass-bg-hover: #ffffff;
+    --glass-edge: rgba(255, 255, 255, 1);
+    --glass-rim: rgba(11, 13, 17, 0.10);
+  }
+}
+
+/* Respect a user's request for less motion at the token level, so
+   components that read --glass-dur pick it up. Individual components
+   still need their own reduced-motion blocks for the transforms. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --glass-dur: 1ms;
+    --app-hover-dur: 1ms;
+  }
+}

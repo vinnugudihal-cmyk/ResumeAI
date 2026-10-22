@@ -3,9 +3,18 @@ import io
 import json
 import os
 import sys
+import tempfile
 from unittest.mock import patch
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+# This suite registers accounts and uploads files, so it must never
+# touch the real database. RESUMEAI_DB has to be set before app.py is
+# imported, because the schema is built at import time.
+_TMP = tempfile.mkdtemp(prefix="resumeai_jd_")
+os.environ["RESUMEAI_DB"] = os.path.join(_TMP, "jd.db")
+os.environ["RESUMEAI_UPLOADS"] = os.path.join(_TMP, "uploads")
+os.environ["RESUMEAI_SECRET_KEY"] = "jd-passthrough-test-secret"
 
 from analyzer import analyze_resume
 from app import app
@@ -35,6 +44,34 @@ JOB_DESCRIPTION = (
     "Looking for a backend engineer with REST API, agile, scrum, "
     "unit testing, cloud, and deployment experience."
 )
+
+# The /analyze route now calls the detailed extractor so it can
+# report why a PDF failed. This stands in for a text PDF.
+FAKE_EXTRACTION = {
+    "text": SAMPLE_RESUME,
+    "method": "pypdf",
+    "pages": 1,
+    "reason": "",
+}
+
+
+def signed_in_client():
+    """Flask test client with a registered, logged-in account."""
+
+    import uuid
+
+    client = app.test_client()
+
+    client.post(
+        "/auth/register",
+        json={
+            "name": "JD Tester",
+            "email": f"jd-{uuid.uuid4().hex[:10]}@example.com",
+            "password": "test-password-123",
+        },
+    )
+
+    return client
 
 
 def test_scorer_uses_job_description():
@@ -66,12 +103,12 @@ def test_scorer_uses_job_description():
 
 
 def test_flask_accepts_job_description_form_field():
-    client = app.test_client()
+    client = signed_in_client()
     data = {
         "resume": (io.BytesIO(b"%PDF-1.4 test"), "resume.pdf"),
         "job_description": JOB_DESCRIPTION,
     }
-    with patch("app.extract_text", return_value=SAMPLE_RESUME):
+    with patch("app.extract_text_detailed", return_value=FAKE_EXTRACTION):
         resp = client.post(
             "/analyze",
             data=data,
@@ -87,7 +124,7 @@ def test_flask_accepts_job_description_form_field():
     data_no_jd = {
         "resume": (io.BytesIO(b"%PDF-1.4 test"), "resume.pdf"),
     }
-    with patch("app.extract_text", return_value=SAMPLE_RESUME):
+    with patch("app.extract_text_detailed", return_value=FAKE_EXTRACTION):
         resp_no_jd = client.post(
             "/analyze",
             data=data_no_jd,

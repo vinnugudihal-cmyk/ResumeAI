@@ -1,0 +1,543 @@
+/* =========================================
+   Education editor.
+
+   Saved entries are glass cards, one per qualification. They take the
+   shared card hover from `cardHover.css` - `.ed-row` is in that file's
+   explicit list - so they lift, brighten and show the 4px left accent
+   exactly like the dashboard cards do.
+
+   The form is a panel, not a card: it is NOT in the shared hover list,
+   because lifting a panel that is full of inputs would be decoration
+   rather than feedback. Fields, labels and errors keep an opaque,
+   near-white surface so they stay readable on top of the glass.
+
+   Everything here reads the shared tokens in `theme.css`. No new
+   colours are introduced.
+   ========================================= */
+
+.ed-card {
+  margin-bottom: 18px;
+}
+
+/* The Add Education button. A filled button rather than a ghost one:
+   adding an entry is the primary action of this section, so it should
+   not look like the secondary "Cancel" beside it. */
+.ed-add {
+  border-radius: var(--app-radius-pill);
+  padding-left: 18px;
+  padding-right: 18px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ---------- heading + "+ Add" in one box ---------- */
+
+/* The section header. Heading and its one action share a single box,
+   which is what the brief asks for: not a title with a button floating
+   somewhere else on the card. It is a header, not an interactive
+   surface, so it takes no card hover - only the button inside does. */
+.ed-head-box {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  padding: 16px 18px;
+  margin-bottom: 14px;
+
+  border: 1px solid var(--app-line);
+  border-radius: var(--app-radius-lg);
+  background: var(--app-surface-2);
+}
+
+.ed-head-text {
+  min-width: 0;
+  flex: 1 1 260px;
+}
+
+.ed-head-text .cp-card-title {
+  margin-bottom: 6px;
+}
+
+.ed-head-text .cp-hint {
+  margin: 0;
+}
+
+/* ---------- the category list revealed by "+ Add" ---------- */
+
+.ed-categories {
+  padding: 16px 18px;
+  margin-bottom: 14px;
+
+  border: 1px solid var(--app-accent-line, #c7d2fe);
+  border-radius: var(--app-radius-lg);
+  background: var(--app-accent-soft, #eef2ff);
+}
+
+.ed-categories-lede {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.ed-category-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* One qualification category. Each is a row: the level on the left,
+   its own Add (or Adds, when the level covers two kinds) on the right. */
+.ed-category {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  padding: 10px 14px;
+
+  border: 1px solid var(--app-line);
+  border-radius: var(--app-radius);
+  background: var(--app-surface);
+}
+
+.ed-category-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.ed-category-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ed-category-add {
+  border-radius: var(--app-radius-pill);
+}
+
+/* The read-only line that says which kind the open form is for, shown
+   instead of the radio chooser when adding from the category list. */
+.ed-adding-kind {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: var(--app-dim);
+}
+
+.ed-adding-kind strong {
+  color: var(--app-text);
+}
+
+/* The line under the marks that names where an auto-filled percentage
+   came from. Small and quiet - it is a footnote to the field above,
+   not a warning. */
+.ed-derived {
+  margin: 12px 0 0;
+  padding: 10px 14px;
+
+  border: 1px solid var(--app-accent-line, #c7d2fe);
+  border-radius: var(--app-radius);
+  background: var(--app-accent-soft, #eef2ff);
+
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--app-dim);
+}
+
+.ed-derived strong {
+  color: var(--app-accent-hover, #2447c8);
+}
+
+/* ---------- saved entries ---------- */
+
+.ed-empty {
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px dashed var(--app-line-strong);
+  border-radius: var(--app-radius);
+  background: var(--app-surface-2);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--app-muted);
+}
+
+/* One qualification. The surface is a pearl gradient with the diagonal
+   reflection on top of it, a white inner highlight along the top edge
+   and two layered shadows - the tight contact one plus a wide soft one.
+   Near-white, so the name and the meta line stay well above contrast. */
+.ed-row {
+  position: relative;
+  margin-top: 12px;
+  padding: 16px 18px 16px 20px;
+  border: 1px solid var(--app-line);
+  border-radius: var(--app-radius-lg);
+  background:
+    var(--glass-reflection),
+    linear-gradient(180deg, #ffffff 0%, #f5f8fc 100%);
+  box-shadow:
+    var(--glass-inner),
+    0 1px 2px rgba(11, 13, 17, 0.04),
+    0 12px 28px rgba(11, 13, 17, 0.06);
+}
+
+.ed-row-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ed-row-head strong {
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: var(--app-text);
+  overflow-wrap: anywhere;
+}
+
+.ed-meta {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--app-dim);
+  overflow-wrap: anywhere;
+}
+
+.ed-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* The reorder buttons are small, so they need a target a finger can
+   actually hit. */
+.ed-icon {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--app-line-strong);
+  border-radius: var(--app-radius-sm);
+  background: var(--app-surface);
+  color: var(--app-text);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.ed-icon:hover:not(:disabled) {
+  border-color: var(--app-accent);
+  color: var(--app-accent-hover);
+}
+
+.ed-icon:focus-visible {
+  outline: 2px solid var(--app-focus);
+  outline-offset: 2px;
+}
+
+.ed-icon:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* Destructive is deliberately distinct from the neutral Edit beside
+   it, so "Delete" never reads as the safe choice. */
+.ed-danger:hover:not(:disabled),
+.ed-danger:focus-visible:not(:disabled) {
+  border-color: var(--app-danger-line);
+  color: var(--app-danger);
+}
+
+/* ---------- the form ---------- */
+
+.ed-form {
+  margin-top: 18px;
+  padding: 20px;
+  border: 1px solid var(--app-line);
+  border-radius: var(--app-radius-lg);
+  background:
+    var(--glass-reflection),
+    linear-gradient(180deg, #ffffff 0%, #f6f9fd 100%);
+  box-shadow:
+    var(--glass-inner),
+    0 1px 2px rgba(11, 13, 17, 0.04),
+    0 16px 36px rgba(11, 13, 17, 0.07);
+}
+
+.ed-form-title {
+  margin: 0 0 16px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+/* ---------- choosing the qualification ---------- */
+
+/*
+  The qualification is a row of selectable pills rather than a single
+  dropdown. It reads as "pick what you are adding", it shows every kind
+  at once instead of hiding them behind one closed control, and it does
+  not imply that the list is a sequence you must work down.
+
+  Each pill is a real radio input with a real label, so arrow keys,
+  Home/End and Tab all work; the input itself is hidden visually but
+  not from assistive technology.
+*/
+
+.ed-choose {
+  margin: 0 0 18px;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.ed-choose legend {
+  padding: 0;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--app-dim);
+}
+
+.ed-choose legend em {
+  color: var(--app-danger);
+  font-style: normal;
+}
+
+.ed-choose-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ed-choice {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border: 1px solid var(--app-line-strong);
+  border-radius: var(--app-radius-pill);
+  background: var(--app-surface);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--app-dim);
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.ed-choice:hover {
+  border-color: var(--app-accent-line);
+  color: var(--app-text);
+}
+
+.ed-choice.is-active {
+  border-color: var(--app-accent);
+  background: var(--app-accent-soft);
+  color: var(--app-accent);
+  box-shadow: 0 0 0 3px rgba(49, 85, 217, 0.12);
+}
+
+.ed-choice input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* The hidden input cannot show a ring, so the visible text takes one
+   when the radio has keyboard focus. */
+.ed-choice input:focus-visible + span {
+  outline: 2px solid var(--app-focus);
+  outline-offset: 3px;
+  border-radius: var(--app-radius-sm);
+}
+
+/* ---------- fields ---------- */
+
+.ed-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.ed-field {
+  display: block;
+  min-width: 0;
+}
+
+.ed-field > span {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--app-dim);
+}
+
+.ed-field > span em {
+  color: var(--app-danger);
+  font-style: normal;
+}
+
+/* Optional is said plainly. It used to be the unmarked default, so
+   someone filling in a degree could not tell which fields they were
+   actually expected to have. */
+.ed-optional {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--app-muted);
+  text-transform: lowercase;
+}
+
+/* Opaque, not glass. A translucent field on a translucent panel is
+   two layers of near-white between the user and the text. */
+.ed-field input,
+.ed-field select {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--app-text);
+  background: var(--app-surface);
+  border: 1px solid var(--app-line-strong);
+  border-radius: var(--app-radius-sm);
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.ed-field input:focus,
+.ed-field select:focus {
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 3px rgba(49, 85, 217, 0.12);
+}
+
+.ed-field input[aria-invalid="true"],
+.ed-field select[aria-invalid="true"] {
+  border-color: var(--app-danger-line);
+}
+
+.ed-error {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+  color: var(--app-danger);
+}
+
+.ed-note {
+  margin: 14px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--app-muted);
+}
+
+.ed-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.ed-status {
+  font-size: 13px;
+  color: var(--app-muted);
+}
+
+.ed-status-error {
+  display: block;
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: var(--app-radius);
+  border: 1px solid var(--app-danger-line);
+  background: var(--app-danger-soft);
+  color: var(--app-danger);
+  font-size: 13px;
+}
+
+/* ---------- mobile ---------- */
+
+@media (max-width: 640px) {
+  .ed-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ed-row {
+    padding: 14px 14px 14px 16px;
+  }
+
+  .ed-row-actions {
+    width: 100%;
+  }
+
+  .ed-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ed-add {
+    white-space: normal;
+  }
+}
+
+/* ---------- devices without a pointer ---------- */
+
+/*
+  A touch screen never fires `:hover`, and some mobile browsers fire it
+  once on tap and leave the pill stuck in its hovered state. Only the
+  hover-only feedback is dropped; the resting border and fill stay, so
+  the pill still reads as a control.
+*/
+
+@media (hover: none) {
+  .ed-choice:hover {
+    border-color: var(--app-line-strong);
+    color: var(--app-dim);
+  }
+}
+
+/* ---------- reduced motion ---------- */
+
+/*
+  Movement is removed; the feedback is not. A pill still changes border,
+  fill and colour when selected, and still shows its focus ring - a user
+  who has asked for less motion still needs to know what is interactive.
+
+  The card lift itself is switched off by `cardHover.css`, which owns
+  that transform.
+*/
+
+@media (prefers-reduced-motion: reduce) {
+  .ed-choice,
+  .ed-icon,
+  .ed-field input,
+  .ed-field select {
+    transition: none;
+  }
+}

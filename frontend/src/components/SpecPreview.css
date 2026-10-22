@@ -1,0 +1,615 @@
+/* Declarative preview.
+
+   Mirrors ai-service/layout_engine.py in the browser. The naming and
+   the metrics follow ResumePreview.css so the hand-built designs and
+   the generated ones read as the same product.
+
+   Everything is sized in `em` against `.sp-sheet`'s font-size, which
+   is the only thing that differs between a thumbnail (11px, the scale
+   the gallery already used for the paper) and a full-size preview
+   (16px, so body text stays legible on a phone). One rule therefore
+   serves both, and nothing has to be duplicated per breakpoint. */
+
+.sp-sheet {
+  /* The document's own accent, deliberately not the app's UI
+     accent. This colour is part of the resume that gets printed
+     and downloaded, so it must not change when the interface does. */
+  --sp-accent: #3155d9;
+  --sp-accent-soft: #a6bef4;
+  --sp-rail-faded: #c9d2f7;
+  --sp-ink: #1c2333;
+  --sp-muted: #6b7385;
+  --sp-faint: #ccd1dc;
+  --sp-rule: #e2e6ef;
+  --sp-rail-width: 34%;
+  --sp-tight-gap: 0.36em;
+
+  font-size: 11px;
+  line-height: var(--sp-lead, 1.24);
+  color: var(--sp-ink);
+  background: #fff;
+  overflow: hidden;
+}
+
+/* Full size: the preview has to be readable, not a squashed page.
+   16px of body text also stops iOS zooming when the sheet is the
+   thing being focused inside the modal. */
+.sp-readable {
+  font-size: 16px;
+}
+
+/* ---------- fonts ---------- */
+
+.sp-font-classic {
+  font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+}
+.sp-font-modern {
+  font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Courier was dropped from the engine because a monospace resume
+   reads as a 1990s technical CV. The third personality is a sans
+   body under serif headings - FONT_FAMILY["modern"] in
+   resume_pdf.py - so the headings have to pick the serif up
+   explicitly, or the thumbnail promises a document the export
+   does not produce. */
+.sp-font-modern .sp-name,
+.sp-font-modern .sp-rail-name,
+.sp-font-modern .sp-banner-name,
+.sp-font-modern .sp-entry-title,
+.sp-font-modern .sp-h {
+  font-family: Georgia, "Times New Roman", serif;
+}
+.sp-font-serif {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+/* ---------- density ----------
+   resume_pdf.DENSITY, expressed against the 11pt page text:
+   section 12 / 15 / 19, entry 5 / 7 / 9. */
+
+.sp-density-compact {
+  --sp-lead: 1.16;
+  --sp-section-gap: 1.09em;
+  --sp-entry-gap: 0.45em;
+}
+.sp-density-normal {
+  --sp-lead: 1.24;
+  --sp-section-gap: 1.36em;
+  --sp-entry-gap: 0.64em;
+}
+.sp-density-relaxed {
+  --sp-lead: 1.34;
+  --sp-section-gap: 1.73em;
+  --sp-entry-gap: 0.82em;
+}
+
+/* ---------- columns ---------- */
+
+.sp-sheet.sp-has-rail {
+  display: flex;
+}
+
+.sp-sheet.sp-has-rail.sp-header-banner .sp-rail,
+.sp-sheet.sp-has-rail.sp-header-banner .sp-main {
+  padding-top: 1.2em;
+}
+
+.sp-main {
+  flex: 1;
+  min-width: 0;
+  padding: 1.6em;
+}
+
+.sp-rail {
+  flex: 0 0 var(--sp-rail-width);
+  width: var(--sp-rail-width);
+  padding: 1.4em;
+  overflow: hidden;
+}
+
+/* An unfilled rail is separated by a hairline rather than a block of
+   colour, which is what the engine draws. */
+.sp-rail-line {
+  background: #fff;
+}
+
+.sp-rail-left.sp-rail-line {
+  border-right: 0.0625em solid var(--sp-faint);
+}
+
+.sp-rail-right.sp-rail-line {
+  border-left: 0.0625em solid var(--sp-faint);
+}
+
+.sp-rail-fill {
+  color: #fff;
+  background: var(--sp-accent);
+}
+
+.sp-rail-fill .sp-rail-name,
+.sp-rail-fill .sp-rail-headline,
+.sp-rail-fill .sp-rail-line {
+  color: #fff;
+}
+
+.sp-rail-fill .sp-rail-contact-line,
+.sp-rail-fill .sp-entry-meta,
+.sp-rail-fill .sp-skill-label {
+  color: var(--sp-rail-faded);
+}
+
+/* On a filled rail the accent heading colour would disappear into the
+   background, so headings switch to white exactly as they do in the
+   engine's `on_dark` path. */
+.sp-rail-fill .sp-h {
+  color: #fff;
+  border-bottom-color: rgba(255, 255, 255, 0.35);
+}
+
+.sp-rail-fill .sp-skill-items,
+.sp-rail-fill .sp-entry-title {
+  color: #fff;
+}
+
+.sp-rail-fill .sp-skill-label {
+  text-align: right;
+}
+
+/* ---------- rail header ---------- */
+
+.sp-rail-head {
+  margin-bottom: 1em;
+}
+
+.sp-rail-name {
+  margin: 0;
+  font-size: 1.23em;
+  font-weight: 700;
+}
+
+.sp-rail-headline,
+.sp-rail-contact-line,
+.sp-rail-line {
+  margin: 0.2em 0 0;
+  font-size: 0.91em;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.sp-rail-line {
+  margin-top: 0.35em;
+}
+
+.sp-rail-body {
+  font-size: 0.95em;
+  line-height: 1.45;
+}
+
+/* ---------- body header in a two column layout ---------- */
+
+.sp-body-head {
+  margin-bottom: 1.1em;
+}
+
+.sp-body-headline {
+  margin: 0;
+  font-size: 1.1em;
+  font-weight: 700;
+  color: var(--sp-accent);
+}
+
+/* ---------- headers ---------- */
+
+.sp-head {
+  margin-bottom: 1.3em;
+}
+
+.sp-name {
+  margin: 0;
+  font-size: 2.18em;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.0125em;
+  word-break: break-word;
+}
+
+.sp-name-small {
+  font-size: 1.9em;
+}
+
+.sp-name-centre {
+  text-align: center;
+}
+
+.sp-headline {
+  margin: 0.25em 0 0;
+  font-size: 1.09em;
+  font-weight: 700;
+  color: var(--sp-accent);
+}
+
+.sp-headline-muted {
+  font-weight: 400;
+  color: var(--sp-muted);
+}
+
+.sp-headline-centre {
+  text-align: center;
+}
+
+.sp-contact {
+  margin: 0.6em 0 0;
+  font-size: 0.91em;
+  color: var(--sp-muted);
+  word-break: break-word;
+}
+
+.sp-contact-centre {
+  text-align: center;
+}
+
+.sp-contact-below {
+  margin-top: 0.5em;
+}
+
+/* ruled: name, contact, then a full width accent rule */
+.sp-head-ruled {
+  position: relative;
+}
+
+.sp-accent-rule {
+  height: 0.125em;
+  margin-top: 0.55em;
+  background: var(--sp-accent);
+}
+
+/* banded: the name sits on a soft accent wash, contact below it */
+.sp-head-banded {
+  margin: -1.6em -1.6em 0;
+  padding: 1.1em 1.6em 0.9em;
+  background: var(--sp-accent-soft);
+}
+
+.sp-head-banded .sp-name {
+  font-size: 1.9em;
+}
+
+/* boxed: everything inside a hairline frame, centred */
+.sp-head-boxed {
+  padding: 1em 0.8em 0.9em;
+  text-align: center;
+  border: 0.0625em solid var(--sp-faint);
+  border-radius: 0.125em;
+}
+
+/* banner: a tall accent block with the name reversed out of it */
+.sp-head-banner {
+  margin: -1.6em -1.6em 1.4em;
+  padding: 1.5em 1.6em 1.3em;
+  color: #fff;
+  background: var(--sp-accent);
+}
+
+.sp-banner-name {
+  margin: 0;
+  font-size: 2.1em;
+  font-weight: 700;
+  line-height: 1.1;
+  word-break: break-word;
+}
+
+.sp-banner-contact {
+  margin: 0.5em 0 0;
+  font-size: 0.91em;
+  line-height: 1.6;
+  color: var(--sp-accent-soft);
+}
+
+/* split: name on the left, up to four contact lines right aligned */
+.sp-head-split {
+  display: flex;
+  gap: 1em;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.sp-head-split .sp-name {
+  font-size: 1.9em;
+}
+
+.sp-split-contact {
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.sp-split-contact span {
+  display: block;
+  font-size: 0.91em;
+  line-height: 1.6;
+  color: var(--sp-muted);
+}
+
+/* ---------- sections ---------- */
+
+.sp-section {
+  margin-bottom: var(--sp-section-gap);
+}
+
+.sp-h {
+  margin: 0 0 0.7em;
+  padding-bottom: 0.35em;
+  font-size: 0.95em;
+  font-weight: 700;
+  color: var(--sp-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  border-bottom: 0.0625em solid var(--sp-faint);
+}
+
+/* ruled (default): title, then a full width hairline */
+.sp-h-bare {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+/* underlined: a short accent line under the title */
+.sp-h-underline {
+  padding-bottom: 0;
+  border-bottom: 0;
+  box-shadow: inset 0 -0.125em 0 var(--sp-accent);
+  padding-left: 0;
+  width: min(9em, 45%);
+}
+
+/* centred rule: the title centred over a short rule */
+.sp-h-centred {
+  position: relative;
+  padding-bottom: 0.55em;
+  border-bottom: 0;
+  text-align: center;
+}
+
+.sp-h-centred::after {
+  content: "";
+  display: block;
+  width: min(7em, 40%);
+  height: 0.125em;
+  margin: 0.35em auto 0;
+  background: var(--sp-accent);
+}
+
+/* numbered: an accent ordinal to the left of the title */
+.sp-h-numbered {
+  display: flex;
+  gap: 0.6em;
+  align-items: baseline;
+}
+
+.sp-h-num {
+  flex-shrink: 0;
+  font-weight: 700;
+  color: var(--sp-accent);
+}
+
+/* accent bar: a short solid block beside the title */
+.sp-h-bar {
+  display: flex;
+  gap: 0.75em;
+  align-items: baseline;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.sp-h-bar-mark {
+  flex-shrink: 0;
+  width: 0.28em;
+  height: 0.95em;
+  background: var(--sp-accent);
+}
+
+/* boxed: the title sits inside a light frame */
+.sp-h-box {
+  margin-bottom: 0.7em;
+  padding: 0.4em 0.6em;
+  border: 0.0625em solid var(--sp-faint);
+  border-radius: 0.125em;
+}
+
+.sp-h-box .sp-h {
+  margin: 0;
+}
+
+.sp-summary {
+  margin: 0;
+  font-size: 1em;
+  line-height: 1.5;
+}
+
+/* ---------- skills ---------- */
+
+.sp-skill-line {
+  display: flex;
+  gap: 0.8em;
+  align-items: baseline;
+  margin: 0 0 0.35em;
+  font-size: 0.95em;
+}
+
+.sp-skill-items {
+  flex: 1;
+  min-width: 0;
+}
+
+.sp-skill-label {
+  flex-shrink: 0;
+  font-size: 0.92em;
+  font-weight: 700;
+  color: var(--sp-muted);
+  text-align: right;
+}
+
+.sp-skill-inline {
+  margin: 0;
+  font-size: 0.95em;
+  line-height: 1.6;
+}
+
+.sp-skill-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 1.4em;
+}
+
+/* ---------- entries ---------- */
+
+.sp-entry {
+  margin-bottom: var(--sp-entry-gap);
+}
+
+.sp-entry:last-child {
+  margin-bottom: 0;
+}
+
+.sp-entry-tight {
+  margin-bottom: var(--sp-tight-gap);
+}
+
+.sp-entry-head,
+.sp-dot-head {
+  display: flex;
+  gap: 0.8em;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.sp-entry-title {
+  font-size: 1.05em;
+  font-weight: 700;
+}
+
+.sp-date {
+  flex-shrink: 0;
+  font-size: 0.86em;
+  color: var(--sp-muted);
+  white-space: nowrap;
+}
+
+.sp-entry-sub {
+  margin-top: 0.15em;
+  font-size: 0.95em;
+  color: var(--sp-accent);
+}
+
+.sp-entry-meta {
+  margin-top: 0.1em;
+  font-size: 0.86em;
+  color: var(--sp-muted);
+}
+
+.sp-entry-meta-italic {
+  font-style: italic;
+}
+
+.sp-bullets {
+  margin: 0.4em 0 0;
+  padding-left: 1.25em;
+}
+
+.sp-bullets li {
+  margin-bottom: 0.15em;
+  font-size: 1em;
+}
+
+.sp-bullets li::marker {
+  color: var(--sp-accent);
+}
+
+/* timeline: dates down a narrow gutter beside a hairline and a dot */
+.sp-entry-timeline {
+  display: flex;
+  gap: 0.9em;
+  align-items: stretch;
+}
+
+.sp-tl-side {
+  position: relative;
+  flex: 0 0 15%;
+  padding-right: 0.9em;
+  border-right: 0.0625em solid var(--sp-faint);
+}
+
+.sp-tl-date {
+  font-size: 0.8em;
+  color: var(--sp-muted);
+}
+
+.sp-tl-dot {
+  position: absolute;
+  top: 0.35em;
+  right: -0.3em;
+  width: 0.5em;
+  height: 0.5em;
+  background: var(--sp-accent);
+  border-radius: 50%;
+}
+
+.sp-tl-body {
+  flex: 1;
+  min-width: 0;
+}
+
+/* dotted: a leader of dots carries the dates across the line */
+.sp-dot-leader {
+  flex: 1;
+  height: 0;
+  margin: 0 0.5em;
+  border-bottom: 0.125em dotted var(--sp-faint);
+}
+
+/* boxed: the entry inside a hairline frame */
+.sp-entry-boxed {
+  position: relative;
+  padding: 0.55em 0.8em;
+  border: 0.0625em solid var(--sp-faint);
+  border-radius: 0.125em;
+}
+
+.sp-entry-boxed > .sp-date {
+  display: block;
+  margin-top: 0.15em;
+  text-align: right;
+}
+
+/* underline: each entry closed with a hairline */
+.sp-entry-underline {
+  padding-bottom: 0.4em;
+  border-bottom: 0.0625em solid var(--sp-faint);
+}
+
+.sp-empty {
+  margin: 2em 0;
+  font-size: 1em;
+  color: #9aa1b2;
+  text-align: center;
+}
+
+/* ---------- phone ---------- */
+
+@media (max-width: 720px) {
+  /* A two column layout on a 360px screen leaves a column too narrow
+     to read, so the rail stacks above the body rather than beside
+     it. The paper is a page, not a phone screen. */
+  .sp-sheet.sp-has-rail {
+    flex-direction: column;
+  }
+
+  .sp-rail {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+
+  .sp-rail-right {
+    order: -1;
+  }
+}

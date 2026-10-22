@@ -1,0 +1,1177 @@
+
+  .tg-page {max-width: 1120px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color: var(--app-text);}
+
+
+.tg-header {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.tg-header h1 {
+  margin: 8px 0 6px;
+  font-size: 30px;
+  line-height: 1.15;
+}
+  .tg-sub {margin: 0;
+  max-width: 560px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--app-muted);}
+
+
+.tg-back {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--app-accent);
+  text-decoration: none;
+
+  transition:
+    color 0.2s ease,
+    text-decoration-color 0.2s ease;
+}
+
+.tg-back:hover {
+  color: var(--app-accent-hover);
+  text-decoration: underline;
+}
+
+.tg-back:focus-visible {
+  outline: 2px solid var(--app-focus);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.tg-flow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--app-dim);
+  background: var(--app-accent-soft);
+  border: 1px solid var(--app-accent-line);
+  border-radius: 12px;
+}
+
+.tg-flow-step.active {
+  color: var(--app-accent);
+}
+
+
+.tg-flow-arrow {
+  color: #a8b0c2;
+}
+
+/* ---------- toolbar ---------- */
+
+.tg-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 22px;
+}
+
+.tg-search {
+  flex: 1 1 240px;
+  min-width: 0;
+  padding: 11px 14px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--app-text);
+  background: var(--app-surface);
+  border: 1px solid var(--app-line-strong);
+  border-radius: 10px;
+  outline: none;
+}
+
+.tg-search:focus {
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 3px rgba(49, 85, 217, 0.12);
+}
+
+
+/* ============================================================
+   RESUME / CV SELECTOR
+
+   Two entries into one catalogue. The registry has no CV-only
+   designs - every layout is a general document layout - so these
+   are two names for the same real list, not two lists pretending to
+   differ. The selected one is obvious at a glance.
+   ============================================================ */
+
+.tg-views {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 0 0 8px;
+}
+
+.tg-view {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 15px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--app-dim);
+  background: var(--app-surface);
+  border: 1px solid var(--app-line-strong);
+  border-radius: 999px;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease,
+              border-color 0.15s ease;
+}
+
+.tg-view:hover {
+  background: var(--app-surface-2);
+}
+
+.tg-view:focus-visible {
+  outline: 3px solid var(--app-accent);
+  outline-offset: 2px;
+}
+
+.tg-view.is-current {
+  color: var(--app-accent-ink);
+  background: var(--app-accent);
+  border-color: var(--app-accent);
+}
+
+/*
+ * Stated rather than implied. Without this, two pages showing the
+ * same 124 cards under two different names looks like a bug.
+ */
+.tg-shared-note {
+  margin: 0 0 18px;
+
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #6b7285;
+}.tg-state {
+  padding: 48px 24px;
+  text-align: center;}
+
+
+.tg-state-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 18px;
+}
+
+.tg-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+/*
+  Layout only. The border, the transition and the whole hover treatment
+  are declared once, further down, where the card's visual pass is -
+  a second `.tg-tile:hover` here was setting a border colour that the
+  later rule immediately overwrote, so it was only ever confusing.
+*/
+.tg-tile {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tg-tile.selected {
+  border-color: var(--app-accent);
+}.tg-tile-preview > div {
+  transform: scale(0.52);
+  transform-origin: top left;
+  width: 192%;
+  pointer-events: none;}
+
+
+/* ============================================================
+   PROFILE REMINDER
+
+   One dismissible line, never a redirect. The gallery has to stay
+   open to somebody with no profile: browsing designs is step 1, and
+   being pushed into a long form before seeing anything is the thing
+   this replaces.
+   ============================================================ */
+
+.tg-hint {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 0 0 16px;
+  padding: 11px 14px;
+  border-radius: var(--app-radius);
+  border: 1px solid var(--app-accent-line);
+  background: var(--app-accent-soft);
+  color: var(--app-dim);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.tg-hint-link {
+  font-weight: 600;
+  color: var(--app-accent-hover);
+  text-decoration: underline;
+}
+
+.tg-hint-dismiss {
+  margin-left: auto;
+  border: none;
+  background: none;
+  padding: 0 4px;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--app-muted);
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.tg-hint-dismiss:hover {
+  color: var(--app-text);
+}
+
+.tg-hint-dismiss:focus-visible {
+  outline: 2px solid var(--app-focus);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   REAL THUMBNAILS
+
+   The image is page one of the template's actual PDF, rasterised
+   server-side. It is letterboxed rather than cropped, so the whole
+   page is visible: a crop would show a convincing-looking fragment
+   of a layout the rest of which the visitor never sees, which is the
+   same dishonesty the real render was introduced to remove.
+
+   The old .tg-thumb miniature is kept as the onError fallback, so a
+   template that cannot render degrades instead of breaking.
+   ============================================================ */
+
+.tg-shot {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #eef1f6;
+}
+
+/* Neutral while loading, so the grid does not jump when images
+   arrive at different times. */
+.tg-shot-loading {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      100deg,
+      #eef1f6 30%,
+      #f7f9fc 50%,
+      #eef1f6 70%
+    )
+    0 0 / 300% 100%;
+  animation: tg-shot-shimmer 1.4s linear infinite;
+}
+
+@keyframes tg-shot-shimmer {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+
+.tg-shot-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* Fades in only once decoded, so a half-painted A4 raster is never
+     shown. */
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+
+.tg-shot-img.is-ready {
+  opacity: 1;
+}
+
+/* The fallback miniature. It needs the old scaling treatment the
+   removed .tg-tile-preview > div rule used to give it. */
+.tg-shot-fallback {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.tg-shot-fallback > div {
+  transform: scale(0.52);
+  transform-origin: top left;
+  width: 192%;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tg-shot-loading {
+    animation: none;
+    background: #eef1f6;
+  }
+
+  .tg-shot-img {
+    transition: none;
+  }
+}
+
+.tg-tile-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 16px;
+}
+
+.tg-tile-head {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tg-tile-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.tg-badge {
+  flex-shrink: 0;
+  padding: 3px 9px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-radius: 999px;
+}.tg-tile-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;}
+
+
+/* ---------- empty / messages ---------- */
+
+.tg-empty {
+  padding: 40px 24px;
+  text-align: center;
+}
+
+.tg-empty h2 {
+  margin: 0 0 8px;
+  font-size: 17px;
+}.tg-error-inline {
+  margin: 0 0 16px;}
+.tg-disclaimer a {
+  color: var(--app-accent);}
+
+
+/* ---------- buttons ---------- */
+
+.tg-btn {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  padding: 11px 18px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--app-accent-ink);
+  text-decoration: none;
+  background: var(--app-accent);
+  border: 1px solid var(--app-accent);
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.tg-btn:hover:not(:disabled) {
+  background: var(--app-accent-hover);
+  border-color: var(--app-accent-hover);
+}
+
+.tg-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.tg-btn:focus-visible {
+  outline: 2px solid var(--app-accent);
+  outline-offset: 2px;
+}
+
+.tg-btn-small {
+  padding: 8px 14px;
+  font-size: 13px;
+}.tg-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(17, 24, 39, 0.55);}
+
+
+.tg-modal-inner {
+  width: min(720px, 100%);
+  max-height: 90vh;
+  padding: 22px;
+  overflow-y: auto;
+  background: var(--app-surface);
+  border-radius: 16px;
+}
+
+.tg-modal-head {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.tg-modal-name {
+  margin: 0;
+  font-size: 20px;
+}.tg-modal-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 18px;}
+
+
+/* ---------- mobile ---------- */
+
+@media (max-width: 720px) {
+  .tg-page {
+    padding: 20px 14px 48px;
+  }
+
+  .tg-header {
+    flex-direction: column;
+  }
+
+  .tg-header h1 {
+    font-size: 24px;
+  }
+
+  .tg-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tg-tile-preview {
+    height: 220px;
+  }
+}
+
+/* ============================================================
+   PHONES
+
+   The preview is the whole point of this page, so it is scaled
+   rather than cropped on a small screen. Category chips scroll
+   sideways instead of wrapping into an unusable column.
+   ============================================================ */
+
+@media (max-width: 720px) {
+  .tg-toolbar {
+    gap: 12px;
+  }
+
+  /* Horizontal scroll beats ten stacked chips pushing the grid
+     off the screen. */
+  .tg-filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 6px;
+    scrollbar-width: thin;
+  }
+
+  .tg-filters .tg-chip {
+    flex-shrink: 0;
+    min-height: 40px;
+  }
+
+  .tg-search {
+    font-size: 16px;   /* stops iOS auto-zoom on focus */
+    min-height: 46px;
+  }
+
+  .tg-toggle {
+    min-height: 44px;
+  }
+
+  /* The preview keeps its aspect and shrinks, so the layout is
+     still readable instead of being clipped. */
+  .tg-tile-preview {
+    height: auto;
+    aspect-ratio: 8.5 / 11;
+  }
+
+  .tg-tile-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .tg-tile-actions .tg-btn {
+    width: 100%;
+    min-height: 46px;
+    justify-content: center;
+  }
+
+  /* Full-screen preview sheet, with the paper fitted to the
+     viewport width. */
+  .tg-modal {
+    padding: 0;
+  }
+
+  .tg-modal-inner {
+    width: 100%;
+    max-width: 100%;
+    max-height: 100vh;
+    height: 100vh;
+    border-radius: 0;
+    padding: 16px 14px 24px;
+    overflow-y: auto;
+  }
+
+  .tg-modal-preview {
+    flex: 1;
+    min-height: 0;
+  }
+
+  .tg-modal-preview .resume-preview {
+    width: 100%;
+    height: auto;
+  }
+
+  .tg-modal-actions .tg-btn {
+    width: 100%;
+    min-height: 48px;
+    justify-content: center;
+  }
+
+  .tg-btn,
+  .tg-btn-small {
+    min-height: 44px;
+  }
+
+  /* The five-step flow is a desktop affordance; on a phone it is
+     a wall of arrows with nothing to tap. */
+  .tg-flow {
+    flex-wrap: wrap;
+    font-size: 11px;
+    line-height: 1.9;
+  }
+}
+
+@media (max-width: 420px) {
+  .tg-tile-name {
+    font-size: 15px;
+  }
+
+  .tg-tile-desc {
+    font-size: 12.5px;
+  }
+}
+/* ============================================================
+   LIBRARY CONTROLS
+
+   The gallery grew from 12 designs to a hundred, so the toolbar
+   carries more than a search box and a row of chips. Everything
+   here is built so the counts stay honest: the number next to a
+   filter comes from the server's facets, not from counting cards.
+   ============================================================ */
+
+.tg-header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.tg-count-line {
+  margin: 0 0 14px;
+  font-size: 13.5px;
+  color: #5b657a;
+}
+
+.tg-count-line strong {
+  color: #1a2338;
+}
+
+/* ---------- categories ---------- */
+
+/*
+  The broad categories, as one scrollable row.
+
+  This is not the old filter bar returning: there are no selects, no
+  column/header chips and no checkboxes. It is the catalogue's own
+  category list, each with the number of templates the server says it
+  holds, so a student can start from "Student / Fresher" instead of
+  scrolling 124 cards.
+*/
+.tg-categories {
+  display: flex;
+  gap: 7px;
+  margin: 0 0 16px;
+  padding-bottom: 6px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.tg-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: 0 0 auto;
+
+  padding: 7px 13px;
+
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 650;
+  white-space: nowrap;
+
+  color: var(--app-dim);
+  background: var(--app-surface);
+  border: 1px solid var(--app-line-strong);
+  border-radius: 999px;
+
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease,
+              border-color 0.15s ease;
+}
+
+.tg-category span {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--app-muted);
+}
+
+.tg-category:hover {
+  background: var(--app-surface-2);
+  border-color: var(--app-line-strong);
+}
+
+.tg-category:focus-visible {
+  outline: 3px solid var(--app-accent);
+  outline-offset: 2px;
+}
+
+.tg-category.is-active {
+  color: var(--app-accent-ink);
+  background: var(--app-accent);
+  border-color: var(--app-accent);
+}
+
+.tg-category.is-active span {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* .tg-selects and .tg-select styled the header-style, section-style,
+   experience and sort dropdowns. Removed with the filter bar - see
+   the note above .tg-grid. */
+
+/* ---------- favourite star ---------- */
+
+.tg-tile-frame {
+  position: relative;
+}
+
+.tg-fav {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  font-size: 17px;
+  line-height: 1;
+  color: #6b7690;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid #dfe5f2;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.tg-fav:hover {
+  transform: scale(1.08);
+}
+
+.tg-fav.active {
+  color: #d97706;
+  border-color: #f3d9a4;
+}.tg-more {
+  display: flex;
+  justify-content: center;
+  margin: 26px 0 8px;}
+
+
+.tg-more .tg-btn {
+  min-height: 46px;
+  padding: 12px 28px;
+}
+
+/* ============================================================
+   PHONES
+   ============================================================ */
+
+@media (max-width: 720px) {
+  .tg-header-actions {
+    width: 100%;
+  }
+
+  .tg-header-actions .tg-btn {
+    width: 100%;
+    min-height: 46px;
+    justify-content: center;
+  }
+
+  .tg-selects {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .tg-select,
+  .tg-select select {
+    width: 100%;
+  }
+
+  .tg-select select {
+    font-size: 16px;   /* stops iOS auto-zoom on focus */
+    min-height: 46px;
+  }
+
+  .tg-toggle {
+    min-height: 44px;
+  }
+
+  .tg-count-line {
+    font-size: 13px;
+  }
+
+  .tg-fav {
+    width: 40px;
+    height: 40px;
+  }
+
+  .tg-modal-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .tg-modal-actions .tg-btn {
+    width: 100%;
+    min-height: 48px;
+    justify-content: center;
+  }
+}
+/* ============================================================
+   COLUMNS FILTER
+
+   The first question anyone asks about a layout, so it gets its
+   own row rather than hiding in a dropdown. The previous "Layout"
+   menu listed ninety-two composed labels; nobody can read that, so
+   the axes are filtered separately and the composed label is kept
+   for display only.
+   ============================================================ */
+
+/* .tg-columns styled the "Any columns / One Column / Two Columns"
+   chip row. Removed with the filter bar - see the note above
+   .tg-grid. */
+/* ============================================================
+   VISUAL PASS
+
+   The cards were functional and flat: no depth, no paper, and a
+   cropped preview that did not look like a page. What follows
+   treats each thumbnail as a miniature sheet of A4 sitting on a
+   desk, and each card as an object that lifts when you reach for
+   it.
+   ============================================================ */
+
+.tg-page {
+  color: #151a26;
+}
+
+.tg-header h1 {
+  letter-spacing: -0.02em;
+}
+
+.tg-sub {
+  max-width: 62ch;
+}
+
+/* ---------- card ---------- */
+
+.tg-card {
+  border-radius: 18px;
+  box-shadow:
+    0 1px 2px rgba(20, 30, 60, 0.05),
+    0 6px 18px rgba(20, 30, 60, 0.05);
+}
+
+.tg-tile {
+  border-radius: 18px;
+  border-color: var(--app-line);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.tg-tile:hover {
+  border-color: #c2cef0;
+  /* The hover lift lives here again.
+
+     It used to be commented out with a note saying it had moved to
+     theme.css, which was imported after this file and therefore won.
+     theme.css no longer carries component rules, so the shadow and
+     the 1px lift are declared where the tile is declared. These are
+     the gallery's own original values. */
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(25, 35, 60, 0.06);
+}
+
+/* Keyboard users get the same affordance as a hover, plus a ring
+   they can actually see. */
+.tg-tile:focus-within {
+  border-color: var(--app-accent);
+  box-shadow:
+    0 0 0 3px rgba(49, 85, 217, 0.18),
+    0 14px 30px rgba(20, 30, 60, 0.10);
+}
+
+.tg-tile-preview:focus-visible {
+  outline: none;
+}
+
+.tg-tile-preview:focus-visible .tg-thumb {
+  box-shadow:
+    0 0 0 3px rgba(49, 85, 217, 0.35),
+    0 10px 24px rgba(20, 30, 60, 0.16);
+}
+
+/* ---------- the miniature page ---------- */
+
+.tg-tile-preview {
+  display: block;
+  width: 100%;
+  height: auto;
+  padding: 18px 18px 0;
+  background: linear-gradient(180deg, #eef1f7 0%, #e6eaf3 100%);
+  border: 0;
+  border-bottom: 1px solid #e2e6f0;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+/* A4 is 1 : 1.414.
+
+   The sheet sets its own type, so the only way to turn it into a
+   miniature rather than a crop is to scale that type down with the
+   thumbnail's own width. `cqw` does exactly that, at whatever the
+   grid happens to be doing.
+
+   `zoom` was tried first and cannot do the job. A zoomed element
+   resolves percentages against a containing block that has itself
+   been divided by the zoom, so `width: 100%` laid the sheet out at
+   3852px and painted it at 1117px inside a 324px thumbnail: three
+   and a half times too wide, with the right-hand column of dates
+   and employers cut off. Compensating with `width: 345%` only
+   traded that for a page of unreadably small type.
+
+   The sheet's own pixel rules are converted to `em` - see
+   `make_preview_rules_scale.py` - because a hairline in px stays a
+   full pixel however small the type gets, and a rule forty times
+   too heavy is most of what made the old thumbnails look wrong. */
+.tg-thumb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1.414;
+  overflow: hidden;
+  background: var(--app-surface);
+  border-radius: 3px 3px 0 0;
+  box-shadow:
+    0 1px 2px rgba(20, 30, 60, 0.14),
+    0 8px 18px rgba(20, 30, 60, 0.10);
+  transition: box-shadow 0.2s ease;
+  container-type: inline-size;
+}
+
+/* The class is named rather than `> *`: both sheets set their own
+   `font-size`, and `.tg-thumb > *` ties with `.sp-sheet` on
+   specificity, so which one won came down to the order the two
+   stylesheets happened to be imported in. */
+.tg-thumb > .sp-sheet,
+.tg-thumb > .rp-sheet {
+  /* 11px of type on a 794px A4 sheet is 1.385% of the page's
+     width. Expressed against the thumbnail, that stays the same
+     proportion whether the grid is showing two across or four. */
+  font-size: 1.385cqw;
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+
+  /* The tile centres its favourite star, and `text-align` inherits.
+     Without this the whole sheet inherited it too, so employers,
+     locations and bullet text sat in the middle of a page whose
+     headings were all down the left. Designs that want centred text
+     say so on their own classes. */
+  text-align: left;
+}
+
+@supports not (font-size: 1cqw) {
+  /* Container query units arrived in 2022. Below that, scale the
+     type by hand. 324px is about the widest the grid gets, so
+     this is close to exact on a desktop and slightly large in the
+     narrower breakpoints - approximate, but never broken. */
+  .tg-thumb > .sp-sheet,
+  .tg-thumb > .rp-sheet {
+    font-size: 4.5px;
+  }
+}
+
+/* ---------- card body ---------- */
+
+.tg-tile-body {
+  padding: 18px 18px 20px;
+  gap: 0;
+}
+
+.tg-tile-head {
+  margin-bottom: 8px;
+}
+
+.tg-tile-name {
+  letter-spacing: -0.01em;
+  font-size: 16px;
+  font-weight: 650;
+  color: #101625;
+}
+
+.tg-tile-cat {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 0 0 10px;
+}
+
+.tg-cat-pill {
+  display: inline-block;
+  padding: 3px 9px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #3b4a6b;
+  background: #eef2fa;
+  border: 1px solid #dde5f6;
+  border-radius: 999px;
+}
+
+.tg-tile-layout {
+  font-size: 11.5px;
+  color: #8b93a7;
+}
+
+.tg-tile-desc {
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #5a6379;
+}.tg-tile-best strong {
+  color: #3b4a6b;
+  font-weight: 600;}
+
+
+.tg-tile-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.tg-tile-actions .tg-btn {
+  flex: 1;
+  justify-content: center;
+}
+
+/* ---------- favourite ---------- */
+
+.tg-fav {
+  box-shadow: 0 2px 6px rgba(20, 30, 60, 0.14);
+  transition:
+    color 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.tg-fav:hover {
+  box-shadow: 0 4px 12px rgba(20, 30, 60, 0.2);
+}
+
+.tg-fav:focus-visible {
+  outline: 3px solid rgba(49, 85, 217, 0.4);
+  outline-offset: 2px;
+}
+
+/* ---------- grid rhythm ---------- */
+
+.tg-grid {
+  grid-template-columns: repeat(auto-fill, minmax(272px, 1fr));
+  gap: 22px;
+}
+
+@media (max-width: 720px) {
+  .tg-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .tg-tile-preview {
+    padding: 14px 14px 0;
+  }
+}
+/* The step this page actually represents. Without it every step
+   looked identical, so the strip read as decoration rather than as
+   a position. */
+.tg-flow-step.is-current {
+  background: var(--app-accent-soft);
+  border-color: var(--app-accent-line);
+  color: var(--app-accent-hover);
+  font-weight: 650;
+}
+
+/* ============================================================
+   RESTORED RULES
+
+   These base rules were destroyed by the tokenizer pass - their
+   selector and braces were removed with the rule body left behind -
+   and were re-read verbatim from the pre-damage snapshot. They are
+   appended rather than spliced back inline because none of the
+   selectors exists anywhere else in this file, so order cannot
+   matter. No body was edited; the colours are already tokens.
+   ============================================================ */
+
+.tg-chip {
+  padding: 7px 13px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--app-dim);
+  background: var(--app-surface);
+  border: 1px solid var(--app-line-strong);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.tg-chip:hover {
+  background: var(--app-surface-2);
+}
+
+.tg-chip.active {
+  color: var(--app-accent-ink);
+  background: var(--app-accent);
+  border-color: var(--app-accent);
+}
+
+.tg-toggle input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--app-accent);
+}
+
+.tg-badge-ats {
+  color: var(--app-success);
+  background: var(--app-success-soft);
+}
+
+.tg-tile-best {
+  margin: 0 0 14px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--app-muted);
+}
+
+/*
+  The catalogue category, as a quiet eyebrow under the description.
+
+  It is the same label as the chip that filtered the page, so a card
+  still says what it is when it is reached by scrolling or by search
+  rather than through the chips.
+*/
+.tg-tile-cat {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--app-dim);
+}
+
+.tg-empty p {
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: var(--app-muted);
+}
+
+.tg-error {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--app-danger);
+}
+
+.tg-disclaimer {
+  margin: 22px 0 0;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--app-muted);
+}
+
+.tg-btn-ghost {
+  color: var(--app-dim);
+  background: transparent;
+  border-color: var(--app-line-strong);
+}
+
+.tg-btn-ghost:hover:not(:disabled) {
+  color: var(--app-text);
+  background: var(--app-surface-2);
+  border-color: var(--app-line-strong);
+}
+
+.tg-btn-ghost.is-fav {
+  color: var(--app-warning);
+  border-color: #f3d9a4;
+}
+
+.tg-modal-cat {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--app-muted);
+}

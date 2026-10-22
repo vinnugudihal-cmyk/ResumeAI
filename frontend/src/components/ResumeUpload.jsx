@@ -1,11 +1,12 @@
 import { useRef, useState } from "react";
 import "./ResumeUpload.css";
-import { uploadAndAnalyzeResume, DEMO_SAMPLE_ANALYSIS } from "../services/api";
+import { uploadAndAnalyzeResume } from "../services/api";
 
 function ResumeUpload({
   onAnalysisComplete,
   showDashboardLink = false,
   jobDescription = "",
+  targetRole = "",
 }) {
   const fileInputRef = useRef(null);
 
@@ -15,27 +16,67 @@ function ResumeUpload({
   const [error, setError] = useState("");
   const [dragActive, setDragActive] = useState(false);
 
+  // Filters the detected skills on the results screen. Reset
+  // whenever a new analysis lands, so a filter typed against the
+  // previous resume does not silently hide everything on the next.
+  const [skillFilterText, setSkillFilter] = useState("");
+
   /* =====================================================
      FILE SELECTION
   ===================================================== */
   const handleFileChange = (selectedFile) => {
+    // Every rejection below clears the selection as well as showing
+    // the message.
+    //
+    // Without that, choosing a bad file after a good one left the
+    // old file selected and the Analyse button enabled: the page
+    // said "that file is empty" while the button went on to
+    // analyse the previous file, which is not what anybody reading
+    // the error would expect.
+    const reject = (message) => {
+      setFile(null);
+      setResult(null);
+
+      if (fileInputRef.current) {
+        // Lets the same file be chosen again after it is fixed.
+        fileInputRef.current.value = "";
+      }
+
+      setError(message);
+    };
+
     if (!selectedFile) {
       return;
     }
 
     setError("");
 
-    const isPDF =
-      selectedFile.type === "application/pdf" ||
-      selectedFile.name.toLowerCase().endsWith(".pdf");
+    // Checked by extension as well as by MIME type. Windows
+    // reports an unfamiliar .docx as an empty type or as
+    // application/octet-stream, and rejecting on that alone would
+    // refuse a genuine Word document.
+    const name = selectedFile.name.toLowerCase();
 
-    if (!isPDF) {
-      setError("Please upload a PDF file only.");
+    const isPDF =
+      selectedFile.type === "application/pdf" || name.endsWith(".pdf");
+
+    const isDOCX =
+      selectedFile.type === "application/vnd.openxmlformats-officedocument"
+        + ".wordprocessingml.document" ||
+      name.endsWith(".docx");
+
+    if (!isPDF && !isDOCX) {
+      reject("Please upload a PDF or DOCX file.");
+      return;
+    }
+
+    if (selectedFile.size === 0) {
+      reject("That file is empty. Please choose another one.");
       return;
     }
 
     if (selectedFile.size > 5 * 1024 * 1024) {
-      setError("File size must be less than 5MB.");
+      reject("File size must be less than 5MB.");
       return;
     }
 
@@ -54,31 +95,19 @@ function ResumeUpload({
     handleFileChange(droppedFile);
   };
 
-  /* =====================================================
-     QUICK DEMO LOAD
-  ===================================================== */
-  const handleLoadDemoResume = () => {
-    const mockFile = new File(
-      ["ResumeAI Demo Content"],
-      "Software_Engineer_Sample_Resume.pdf",
-      { type: "application/pdf" }
-    );
-    setFile(mockFile);
-    setError("");
-
-    const demoResult = {
-      ...DEMO_SAMPLE_ANALYSIS,
-      fileName: mockFile.name,
-      fileSize: 245 * 1024,
-      analyzedAt: new Date().toISOString(),
-      isDemo: true,
-    };
-
-    setResult(demoResult);
-    if (onAnalysisComplete) {
-      onAnalysisComplete(demoResult, mockFile);
-    }
-  };
+  /*
+   * QUICK DEMO LOAD - REMOVED
+   *
+   * This used to build a File in memory, hand it a canned analysis
+   * from api.js and paint it on screen without ever contacting the
+   * analysis service. The scores were invented. It also wrote that
+   * fake result into the per-user cache, so it came back as the
+   * "most recent analysis" on the dashboard on the next visit.
+   *
+   * An analysis page that can show numbers nobody computed from any
+   * resume is worse than one that says "upload a file", so the
+   * handler and its button are both gone.
+   */
 
   /* =====================================================
      ANALYZE
@@ -94,10 +123,27 @@ function ResumeUpload({
     setResult(null);
 
     try {
-      const data = await uploadAndAnalyzeResume(file, true, jobDescription);
+      const data = await uploadAndAnalyzeResume(
+        file,
+        // Never a demo fallback here.
+        //
+        // This passed `true`, so when the backend could not be
+        // reached the upload silently returned a canned analysis
+        // with invented scores and skills. It was labelled "DEMO
+        // PREVIEW" in small type, but the scores were still the
+        // first thing on the screen, and on a phone that is not
+        // something anyone reads.
+        //
+        // A failed analysis is now a failure, with the real reason
+        // on it.
+        false,
+        jobDescription,
+        targetRole
+      );
 
       console.log("ResumeAI analysis result:", data);
       setResult(data);
+      setSkillFilter("");
 
       if (onAnalysisComplete) {
         onAnalysisComplete(data, file);
@@ -139,6 +185,23 @@ function ResumeUpload({
       Number(result.ats_score) ||
       Number(result.breakdown?.ats) ||
       0;
+
+    // Filtering the detected skills is presentation only: it hides
+    // chips, it never changes the count above, which stays the real
+    // number found in the file.
+    const skillFilter = skillFilterText.trim().toLowerCase();
+
+    const skillGroups =
+      result.skills_by_category &&
+      typeof result.skills_by_category === "object"
+        ? result.skills_by_category
+        : null;
+
+    const categoryLabels =
+      (result.skills_category_labels &&
+        typeof result.skills_category_labels === "object")
+        ? result.skills_category_labels
+        : {};
 
     return (
       <div className="results-container">
@@ -236,32 +299,114 @@ function ResumeUpload({
           </div>
         </div>
 
-        {/* SKILLS */}
+        {/*
+          SKILLS
+
+          Everything below is `result.skills` - the names the
+          detector actually found in this file. Nothing is added
+          because a skill is popular or because it suits the role;
+          role suggestions live in the separate `role_match` block
+          and are never merged in here.
+
+          `skills_by_category` is the same list sorted into groups
+          by the backend. It is used only to label the chips. The
+          fallback path draws the flat list if an older backend
+          response has no grouping.
+        */}
         <div className="skills-result-card">
           <div className="result-section-heading">
             <div>
-              <div className="result-card-label">SKILLS DETECTED</div>
-              <h4>Your Technical Skillset</h4>
+              <div className="result-card-label">SKILLS FOUND IN YOUR RESUME</div>
+              <h4>What your resume actually shows</h4>
             </div>
 
-            <span className="skills-count">{skills.length} Skills</span>
+            <span className="skills-count">
+              {skills.length} {skills.length === 1 ? "skill" : "skills"}
+            </span>
           </div>
 
-          <div className="skills-list">
-            {skills.length > 0 ? (
-              skills.map((skill, index) => (
-                <span
-                  className="skill-badge-result"
-                  key={`${skill}-${index}`}
-                >
-                  <span>✦</span>
-                  {skill}
-                </span>
-              ))
-            ) : (
-              <p>No technical skills were detected. Add a clear skills section to your resume.</p>
-            )}
-          </div>
+          {skills.length === 0 ? (
+            <p className="skills-empty">
+              No skills detected in this resume. Try uploading a
+              clearer or text-based PDF/DOCX.
+            </p>
+          ) : (
+            <>
+              {skills.length > 0 && (
+                <div className="skills-filter">
+                  <input
+                    type="search"
+                    className="skills-filter-input"
+                    placeholder={
+                      skills.length > 1
+                        ? "Filter these " + skills.length + " skills"
+                        : "Filter skills"
+                    }
+                    aria-label="Filter detected skills"
+                    value={skillFilterText}
+                    onChange={(e) => setSkillFilter(e.target.value)}
+                  />
+                </div>
+              )}
+
+              {Object.keys(skillGroups || {}).length > 0 ? (
+                Object.entries(skillGroups).map(([key, values]) => {
+                  const visible = (values || []).filter((skill) =>
+                    skill.toLowerCase().includes(skillFilter)
+                  );
+
+                  if (!visible.length) return null;
+
+                  return (
+                    <div className="skills-group" key={key}>
+                      <h5 className="skills-group-label">
+                        {categoryLabels[key] || key}
+                      </h5>
+
+                      <div className="skills-list">
+                        {visible.map((skill, index) => (
+                          <span
+                            className="skill-badge-result"
+                            key={`${skill}-${index}`}
+                          >
+                            <span aria-hidden="true">✦</span>
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="skills-list">
+                  {skills
+                    .filter((skill) =>
+                      skill.toLowerCase().includes(skillFilter)
+                    )
+                    .map((skill, index) => (
+                      <span
+                        className="skill-badge-result"
+                        key={`${skill}-${index}`}
+                      >
+                        <span aria-hidden="true">✦</span>
+                        {skill}
+                      </span>
+                    ))}
+                </div>
+              )}
+
+              {skillFilter &&
+                skills.filter((skill) =>
+                  skill.toLowerCase().includes(skillFilter)
+                ).length === 0 && (
+                  <p className="skills-empty">
+                    None of the detected skills match &ldquo;
+                    {skillFilterText.trim()}&rdquo;. Only skills found in
+                    this resume are listed.
+                  </p>
+                )}
+            </>
+          )}
         </div>
 
         {/* SUGGESTIONS */}
@@ -302,27 +447,16 @@ function ResumeUpload({
           <div>
             <h3>Upload Your Resume</h3>
             <p>
-              Upload your PDF resume and let ResumeAI analyze your skills,
-              formatting, ATS compliance, and growth opportunities.
+              Upload your PDF or DOCX resume and let ResumeAI analyze
+              your skills, formatting, ATS compliance, and growth
+              opportunities.
             </p>
           </div>
         </div>
 
         {/* ERROR MESSAGE */}
         {error && (
-          <div
-            role="alert"
-            style={{
-              marginBottom: "16px",
-              padding: "12px 14px",
-              borderRadius: "10px",
-              background: "#fff1f2",
-              border: "1px solid #fecdd3",
-              color: "#be123c",
-              fontSize: "14px",
-              lineHeight: "1.5",
-            }}
-          >
+          <div className="upload-error" role="alert">
             {error}
           </div>
         )}
@@ -343,7 +477,7 @@ function ResumeUpload({
           <input
             ref={fileInputRef}
             type="file"
-            accept=".pdf,application/pdf"
+            accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             hidden
             onChange={(event) =>
               handleFileChange(event.target.files?.[0])
@@ -359,11 +493,11 @@ function ResumeUpload({
           <p>
             {file
               ? file.name
-              : "or click to browse PDF files from your computer"}
+              : "or click to browse PDF and DOCX files from your computer"}
           </p>
 
           <span className="file-info">
-            PDF files only • Maximum size 5MB
+            PDF or DOCX • Maximum size 5MB
           </span>
         </div>
 
@@ -371,7 +505,11 @@ function ResumeUpload({
         {file && (
           <div className="selected-file">
             <div className="file-details">
-              <div className="file-type-icon">PDF</div>
+              <div className="file-type-icon">
+                {file.name.toLowerCase().endsWith(".docx")
+                  ? "DOCX"
+                  : "PDF"}
+              </div>
 
               <div>
                 <strong>{file.name}</strong>
@@ -400,42 +538,19 @@ function ResumeUpload({
           {loading ? (
             <>
               <span className="spinner"></span>
-              Analyzing Resume with AI...
+              Analyzing your resume...
             </>
           ) : (
             <>Analyze Resume →</>
           )}
         </button>
 
-        {/* SAMPLE DEMO TRIGGER */}
-        <div
-          style={{
-            marginTop: "16px",
-            textAlign: "center",
-          }}
-        >
-          <button
-            type="button"
-            onClick={handleLoadDemoResume}
-            style={{
-              background: "none",
-              border: "none",
-              color: "#3155d9",
-              fontSize: "13px",
-              fontWeight: "600",
-              cursor: "pointer",
-              textDecoration: "underline",
-            }}
-          >
-            ⚡ Don't have a PDF right now? Try with an interactive sample resume
-          </button>
-        </div>
 
         {/* FOOTER */}
         <div className="upload-footer">
-          <span>🔒 100% Private & Secure</span>
-          <span>⚡ Instant AI Feedback</span>
-          <span>🎯 ATS Screening Optimized</span>
+          <span>🔒 Read once, stored with your analyses</span>
+          <span>⚡ Every score is computed from your file</span>
+          <span>🎯 ATS scoring included</span>
         </div>
       </div>
     </div>

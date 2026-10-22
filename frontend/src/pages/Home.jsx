@@ -1,25 +1,67 @@
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "./Home.css";
 import ResumeUpload from "../components/ResumeUpload";
+import { fetchCurrentUser } from "../services/api";
+import { ANALYSIS, FILE_META, writeForUser } from "../services/sessionCache";
 
 function Home() {
+  const navigate = useNavigate();
+
+  // Resume data is cached per signed-in account, so the id is
+  // needed before anything is written.
+  const [userId, setUserId] = useState(null);
+
+  // Drives the one place on this page that needs to behave
+  // differently for a signed-in visitor: the analyser section.
+  const [isSignedIn, setIsSignedIn] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetchCurrentUser().then((session) => {
+      if (cancelled) return;
+
+      if (!session?.user) return;
+
+      setUserId(session.user.id);
+      setIsSignedIn(true);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const handleAnalysisComplete = (data, file) => {
-    // Save to localStorage so Dashboard can pick it up
-    try {
-      localStorage.setItem("resumeai_analysis", JSON.stringify(data));
-      if (file) {
-        localStorage.setItem(
-          "resumeai_file_meta",
-          JSON.stringify({
-            name: file.name,
-            size: file.size,
-            date: new Date().toISOString(),
-          })
-        );
-      }
-    } catch (e) {
-      console.warn("Could not save analysis to localStorage", e);
+    // Stored under this account's own key, so the dashboard
+    // shows it to the right person and nobody else.
+    writeForUser(ANALYSIS, userId, data);
+
+    if (file) {
+      writeForUser(FILE_META, userId, {
+        name: file.name,
+        size: file.size,
+        date: new Date().toISOString(),
+      });
     }
+  };
+
+  /*
+   * The hero button.
+   *
+   * A signed-out visitor cannot reach the analyser by scrolling to
+   * it, because the section now asks them to sign in first. So the
+   * button goes straight to login carrying the page they wanted,
+   * and signing in puts them there.
+   */
+  const handleAnalyzeClick = () => {
+    if (isSignedIn) {
+      scrollToAnalyzer();
+      return;
+    }
+
+    navigate("/login", { state: { from: "/analyse" } });
   };
 
   const scrollToAnalyzer = () => {
@@ -35,7 +77,7 @@ function Home() {
           NAVBAR
           ========================================================= */}
       <header className="navbar">
-        <Link to="/" className="logo">
+        <Link to="/home" className="logo">
           Resume<span>AI</span>
         </Link>
 
@@ -54,7 +96,14 @@ function Home() {
           </li>
         </ul>
 
-        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+        <div className="nav-actions">
+          <Link
+            to="/login"
+            state={{ mode: "register" }}
+            className="nav-button-secondary"
+          >
+            Create Account
+          </Link>
           <Link to="/login" className="nav-button">
             Student Login →
           </Link>
@@ -83,7 +132,7 @@ function Home() {
             <button
               type="button"
               className="primary-btn"
-              onClick={scrollToAnalyzer}
+              onClick={handleAnalyzeClick}
             >
               Analyze Your Resume Now →
             </button>
@@ -92,14 +141,33 @@ function Home() {
               View Student Dashboard
             </Link>
           </div>
+
+          <p className="hero-register">
+            New to ResumeAI?{" "}
+            <Link to="/login" state={{ mode: "register" }}>
+              Create a free student account
+            </Link>
+          </p>
         </div>
 
         {/* HERO DASHBOARD PREVIEW CARD */}
         <div className="hero-visual">
           <div className="dashboard-card">
             <div className="dashboard-top">
-              <span className="dashboard-title">Live ResumeAI Analysis</span>
-              <span className="dashboard-status">● High ATS Match</span>
+              {/*
+                A picture of what a report looks like. Every number
+                in it is written into this component rather than read
+                from a database, so it is nobody's resume and it
+                cannot leak one.
+
+                It was headed "Live ResumeAI Analysis", which read as
+                though these were real results. There is no visitor file
+                at this point, so it is now labelled as the sample it is.
+              */}
+              <span className="dashboard-title">
+                Sample ResumeAI Report
+              </span>
+              <span className="dashboard-status">Example — high ATS match</span>
             </div>
 
             <div className="score-circle">
@@ -242,21 +310,60 @@ function Home() {
 
       {/* =========================================================
           LIVE ANALYZER SECTION
-          ========================================================= */}
+
+          The analyzer is a private feature, so it is not offered to
+          a signed-out visitor. It used to be: this section mounted
+          the real ResumeUpload on the public page, so anybody could
+          drop a file into it. Every request came back 401 - the
+          backend was never at risk - but the page advertised a tool
+          that could not work, which is worse than not offering it.
+
+          A visitor is told what it does and asked to sign in.
+          `state.from` is set so signing in lands them on the real
+          analyser page rather than the dashboard.
+      ========================================================= */}
       <section className="analyzer-section" id="analyzer-section">
         <div className="section-heading">
           <span className="section-kicker">TRY IT LIVE</span>
           <h2>Instant Resume Intelligence Report</h2>
           <p>
-            Drop your PDF below to run an instant analysis or test with our sample
-            developer resume.
+            Upload your PDF or DOCX and get an honest score for it: how well
+            it is structured, which skills it evidences, what an applicant
+            tracking system would make of it, and what to change first.
           </p>
         </div>
 
-        <ResumeUpload
-          onAnalysisComplete={handleAnalysisComplete}
-          showDashboardLink={true}
-        />
+        {isSignedIn ? (
+          <ResumeUpload
+            onAnalysisComplete={handleAnalysisComplete}
+            showDashboardLink={true}
+          />
+        ) : (
+          <div className="analyzer-signin">
+            <h3>Sign in to run an analysis</h3>
+            <p>
+              An analysis reads your file, scores it and saves the result
+              to your account, so it needs an account. Creating one takes
+              a moment.
+            </p>
+
+            <Link
+              to="/login"
+              state={{ from: "/analyse" }}
+              className="primary-btn"
+            >
+              Sign in to analyse →
+            </Link>
+
+            <span className="analyzer-signin-note">
+              No account yet?{" "}
+              <Link to="/login" state={{ mode: "register", from: "/analyse" }}>
+                Create one
+              </Link>
+              .
+            </span>
+          </div>
+        )}
       </section>
 
       {/* =========================================================

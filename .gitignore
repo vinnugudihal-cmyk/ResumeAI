@@ -11,4 +11,22 @@ build/
 # Uploaded resumes / temporary files
 backend/uploads/
 ai-service/temp_resume.pdf
+ai-service/uploads/
 *.pdf
+
+# Local database
+*.db
+*.db-wal
+*.db-shm
+
+# Automatic pre-migration backups contain real user data
+ai-service/backups/
+
+# Locally generated session signing key
+.secret_key
+
+# Rendered template thumbnails. A signed-in user's thumbnail is built
+# from their own profile, so this directory can contain their name,
+# email and links. It is a cache: delete it and the next gallery visit
+# rebuilds it.
+ai-service/.thumbnails/

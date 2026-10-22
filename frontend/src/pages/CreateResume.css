@@ -1,0 +1,422 @@
+/* =========================================
+   Create My Resume - step 1, the details.
+
+   Same white / lavender / pale-blue palette as the rest of the
+   app, and the same card treatment. Nothing here is glassy or
+   dark: this is a form, and it should read like one.
+   ========================================= */
+
+.cr-page {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 32px 28px 80px;
+  background: var(--app-bg);
+  color: var(--app-text);
+}
+
+/* ---------- the five steps ---------- */
+
+.cr-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.cr-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px 7px 8px;
+  border-radius: 999px;
+  background: var(--app-surface);
+  border: 1px solid var(--app-line);
+  color: var(--app-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cr-step.current {
+  background: var(--app-accent-soft);
+  border-color: var(--app-accent-line);
+  color: var(--app-accent-hover);
+}
+
+.cr-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--app-line);
+  color: var(--app-text);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cr-step.current .cr-step-num {
+  background: var(--app-accent);
+  color: #ffffff;
+}
+
+/* ---------- heading ---------- */
+
+.cr-head {
+  margin-bottom: 24px;
+}
+
+.cr-head h1 {
+  margin: 0 0 10px;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--app-text);
+}
+
+.cr-head p {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--app-dim);
+}
+
+/* ---------- cards ---------- */
+
+.cr-form {
+  display: grid;
+  gap: 18px;
+}
+
+.cr-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-line);
+  border-radius: 14px;
+  box-shadow: var(--app-shadow);
+  padding: 22px 24px 24px;
+}
+
+.cr-card h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 4px;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.cr-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cr-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--app-accent-soft);
+  color: var(--app-accent-hover);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cr-hint {
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--app-muted);
+}
+
+.cr-empty {
+  margin: 0;
+  padding: 14px;
+  border-radius: 10px;
+  background: var(--app-bg-2);
+  font-size: 13px;
+  color: var(--app-muted);
+}
+
+/* ---------- fields ---------- */
+
+.cr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 14px;
+}
+
+.cr-field {
+  display: block;
+  min-width: 0;
+}
+
+.cr-field > span {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--app-dim);
+}
+
+.cr-field > span em {
+  color: var(--app-danger);
+  font-style: normal;
+}
+
+.cr-field input,
+.cr-field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--app-text);
+  background: #f8fbff;
+  border: 1px solid var(--app-line-strong);
+  border-radius: 9px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cr-field textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.cr-field input:focus,
+.cr-field textarea:focus {
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.cr-field input[aria-invalid="true"] {
+  border-color: var(--app-danger-line);
+}
+
+.cr-error {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+  color: var(--app-danger);
+}
+
+.cr-save-error {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--app-danger-soft);
+  border: 1px solid var(--app-danger-line);
+  font-size: 14px;
+}
+
+/* ---------- repeated entries ---------- */
+
+.cr-entry {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--app-line);
+  background: var(--app-bg-2);
+}
+
+.cr-entry-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: var(--app-text);
+}
+
+.cr-add,
+.cr-remove {
+  border: 1px solid var(--app-line-strong);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #ffffff;
+  color: var(--app-text);
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.cr-add:hover {
+  border-color: var(--app-accent);
+  color: var(--app-accent-hover);
+}
+
+.cr-remove {
+  padding: 5px 12px;
+  background: transparent;
+  color: var(--app-muted);
+}
+
+.cr-remove:hover {
+  border-color: var(--app-danger-line);
+  background: var(--app-danger-soft);
+  color: var(--app-danger);
+}
+
+/* ---------- bullets ---------- */
+
+.cr-bullets {
+  margin-top: 14px;
+}
+
+.cr-bullet-label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--app-dim);
+}
+
+.cr-bullet-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.cr-bullet-row input {
+  flex: 1;
+}
+
+/* ---------- actions ---------- */
+
+.cr-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.cr-save {
+  padding: 13px 26px;
+  border: none;
+  border-radius: 999px;
+  background: var(--app-accent);
+  color: var(--app-accent-ink);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.cr-save:hover:not(:disabled) {
+  background: var(--app-accent-hover);
+}
+
+.cr-save:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.cr-cancel {
+  font-size: 14px;
+  color: var(--app-muted);
+  text-decoration: none;
+}
+
+.cr-cancel:hover {
+  color: var(--app-text);
+}
+
+.cr-note {
+  margin: 0;
+  font-size: 12px;
+  color: var(--app-muted);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 720px) {
+  .cr-page {
+    padding: 20px 16px 56px;
+  }
+
+  .cr-head h1 {
+    font-size: 26px;
+  }
+
+  .cr-card {
+    padding: 18px 16px 20px;
+  }
+
+  .cr-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cr-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cr-save {
+    width: 100%;
+  }
+}
+/* ---------- continue from a saved resume ---------- */
+
+.cr-resume {
+  margin-bottom: 26px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--app-bg-2);
+  border: 1px solid var(--app-line);
+}
+
+.cr-resume-title {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.cr-resume-list {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cr-resume-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cr-resume-name {
+  flex: 1;
+  min-width: 120px;
+  font-size: 14px;
+  color: var(--app-dim);
+}
+
+.cr-resume-row .cr-remove {
+  text-decoration: none;
+}
